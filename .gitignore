@@ -3,3 +3,4 @@
 # misc
 *.obj
 .vs/
+Debug/
