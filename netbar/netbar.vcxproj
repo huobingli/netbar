@@ -92,7 +92,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -187,6 +187,7 @@
     <ClInclude Include="CHttpClient.h" />
     <ClInclude Include="CNetBarLoginDlg.h" />
     <ClInclude Include="COrderDlg.h" />
+    <ClInclude Include="global.h" />
     <ClInclude Include="json\allocator.h" />
     <ClInclude Include="json\assertions.h" />
     <ClInclude Include="json\autolink.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="CHttpClient.cpp" />
     <ClCompile Include="CNetBarLoginDlg.cpp" />
     <ClCompile Include="COrderDlg.cpp" />
+    <ClCompile Include="global.cpp" />
     <ClCompile Include="json_reader.cpp" />
     <ClCompile Include="json_value.cpp" />
     <ClCompile Include="json_writer.cpp" />

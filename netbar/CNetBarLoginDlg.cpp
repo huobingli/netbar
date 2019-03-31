@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "CNetBarLoginDlg.h"
 #include "resource.h"
-#include "json/json.h"
-
-#include "CHttpClient.h"
 #include "netbarDlg.h"
+
+#include "global.h"
 
 CNetBarLoginDlg::CNetBarLoginDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_LOGIN_DIALOG, pParent)
