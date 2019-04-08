@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "COrderDlg.h"
 #include "resource.h"
+#include "CHttpClient.h"
 
 
 COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
@@ -9,6 +10,7 @@ COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_pOrderInfo = new OrderInfo(pOrderInfo);
+	//m_pParent = pParent;
 }
 
 void COrderDlg::DoDataExchange(CDataExchange* pDX)
@@ -20,6 +22,7 @@ BEGIN_MESSAGE_MAP(COrderDlg, CDialog)
 	ON_WM_PAINT()
 	ON_BN_CLICKED(ID_CANCEL_ORDER, &COrderDlg::OnBnClickedCancelOrder)
 	ON_BN_CLICKED(ID_CONFIRM_ORDER, &COrderDlg::OnBnClickedConfirmOrder)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -92,13 +95,54 @@ void COrderDlg::DrawMessage(CDC* pDC, CRect rcDraw)
 // 取消订单
 void COrderDlg::OnBnClickedCancelOrder()
 {
+	CString strURL;
+	strURL.LoadString(IDS_STRING_ORDEROP);
+	strURL = strURL +  _T("cancel/") + m_pOrderInfo->m_strOrderNum + _T("?u=") + ;
 
-}
+	CHttpClient* pHttpClient = new CHttpClient;
+	LPCTSTR pJsonPostData = _T("");
+	CString strResponse;
+	if (pHttpClient)
+	{
+		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+	}
+}	
 
 // 确认接单
 void COrderDlg::OnBnClickedConfirmOrder()
 {
+ 	CString strURL;
+ 	strURL.LoadString(IDS_STRING_ORDEROP);
+ 	strURL = strURL + m_pOrderInfo->m_strOrderNum + _T("receive/");
+// 
+// 	CHttpClient* pHttpClient = new CHttpClient;
+// 	LPCTSTR pJsonPostData = _T("");
+// 	CString strResponse;
+// 	if (pHttpClient)
+// 	{
+// 		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+// 	}
+}
 
+void COrderDlg::OnClose()
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	//CDialog::OnClose();
+}
+
+
+BOOL COrderDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		return CDialog::PreTranslateMessage(pMsg);
+	}
 }
 
 // CString COrderDlg::GetOrderNum()
@@ -146,25 +190,12 @@ void COrderManager::CreateOrderInfo()
 	itOrderInfo it = m_vcOrderInfo.begin();
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-		//if ()
 		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
-		/*m_vcOrderDlg.push_back(*pOrderDlg);*/
-		//it->m_pOrderDlg->MoveWindow();
 	}
-	
-	//pOrderDlg->
-	/*m_vcOrderDlg.push_back(pOrderDlg);*/
 }
 
 void COrderManager::ShowOrderInfo()
 {
-// 	vector<COrderDlg>::iterator it = m_vcOrderDlg.begin();
-// 	for (; it != m_vcOrderDlg.end(); it++)
-// 	{
-// 		it->DoModal();
-// 		//it->m_pOrderDlg->MoveWindow();
-// 	}
-
 	itOrderInfo it = m_vcOrderInfo.begin();
 	CRect rc;
 	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
@@ -173,14 +204,13 @@ void COrderManager::ShowOrderInfo()
 	int nY = rc.bottom;
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-		//if ()
 		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
 		pOrderDlg->Create(IDD_ORDER_DIALOG, NULL);
 		pOrderDlg->ShowWindow(SW_SHOW);
 		pOrderDlg->MoveWindow(nX, nY, 320, 186);
 		nY += 200;
 		nCount--;
-		/*m_vcOrderDlg.push_back(*pOrderDlg);*/
-		//it->m_pOrderDlg->MoveWindow();
 	}
 }
+
+

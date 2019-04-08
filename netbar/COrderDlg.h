@@ -4,12 +4,13 @@
 #include <vector>
 using namespace std;
 
+
 // 订单信息
 struct OrderInfo
 {
 	CString			m_strOrderNum;			// 订单编号
 	CString			m_strLocate;			// 位置
-	CString			m_strMachineNum;			// 电脑台数
+	CString			m_strMachineNum;		// 电脑台数
 	CString			m_strUseTimer;			// 使用时间
 	CString			m_strAdditional;		// 用户要求
 	CString			m_strMessage;			// 用户留言
@@ -45,6 +46,7 @@ typedef vector<OrderDlgInfo> vcOrderDlg;
 typedef vcOrderDlg::iterator	itOrderDlg;
 
 // CNetbarDlg 对话框
+class CNetbarDlg;
 class COrderDlg : public CDialog
 {
 	// 构造
@@ -78,6 +80,10 @@ public:
 
 	//CString GetOrderNum();
 	OrderInfo* m_pOrderInfo;
+	afx_msg void OnClose();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+private:
+	//CNetbarDlg * m_pParent;
 };
 
 // 订单管理类
