@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "COrderDlg.h"
+#include "netbarDlg.h"
 #include "resource.h"
 #include "CHttpClient.h"
 
@@ -23,6 +24,7 @@ BEGIN_MESSAGE_MAP(COrderDlg, CDialog)
 	ON_BN_CLICKED(ID_CANCEL_ORDER, &COrderDlg::OnBnClickedCancelOrder)
 	ON_BN_CLICKED(ID_CONFIRM_ORDER, &COrderDlg::OnBnClickedConfirmOrder)
 	ON_WM_CLOSE()
+	ON_WM_MOVE()
 END_MESSAGE_MAP()
 
 
@@ -97,7 +99,7 @@ void COrderDlg::OnBnClickedCancelOrder()
 {
 	CString strURL;
 	strURL.LoadString(IDS_STRING_ORDEROP);
-	strURL = strURL +  _T("cancel/") + m_pOrderInfo->m_strOrderNum + _T("?u=") + ;
+	strURL = strURL +  _T("cancel/") + m_pOrderInfo->m_strOrderNum + _T("?u=") + _T("eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==");
 
 	CHttpClient* pHttpClient = new CHttpClient;
 	LPCTSTR pJsonPostData = _T("");
@@ -122,6 +124,9 @@ void COrderDlg::OnBnClickedConfirmOrder()
 // 	{
 // 		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
 // 	}
+
+	// 写入到
+	m_pParent->InsertVcRecv();
 }
 
 void COrderDlg::OnClose()
@@ -145,7 +150,19 @@ BOOL COrderDlg::PreTranslateMessage(MSG* pMsg)
 	}
 }
 
-// CString COrderDlg::GetOrderNum()
+void COrderDlg::OnMove(int x, int y)
+{
+	CDialog::OnMove(x, y);
+
+	// TODO: 在此处添加消息处理程序代码
+}
+
+void COrderDlg::SetParent(CNetbarDlg* pParent)
+{
+	m_pParent = pParent;
+}
+
+// CString CRecvDlg::GetOrderNum()
 // {
 // 	if (m_pOrderInfo)
 // 	{
@@ -156,8 +173,9 @@ BOOL COrderDlg::PreTranslateMessage(MSG* pMsg)
 
 //////////////////////////////////////////////////////////////////////////
 /// COrderManager 
-COrderManager::COrderManager()
+COrderManager::COrderManager(CNetbarDlg* pParent)
 {
+	m_pNetBarDlg = pParent;
 	//m_vcOrderInfo.clear();
 }
 
@@ -198,19 +216,50 @@ void COrderManager::ShowOrderInfo()
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
 	CRect rc;
+// 	CWnd* pWnd = AfxGetMainWnd();
+// 	CWnd* pMainWnd = AfxGetApp()->m_pMainWnd;
+// 
+// 	HWND hWnd = AfxGetMainWnd()->GetSafeHwnd();
 	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
+	CPoint pt(rc.TopLeft());
 	int nCount = m_vcOrderInfo.size();
-	int nX = rc.left + 40;
-	int nY = rc.bottom;
+	//ClientToScreen(AfxGetMainWnd()->GetSafeHwnd(), pt);
+// 	int nX = rc.left + 40;
+// 	int nY = rc.bottom;
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
 		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
+		pOrderDlg->SetParent(m_pNetBarDlg);
+		
 		pOrderDlg->Create(IDD_ORDER_DIALOG, NULL);
 		pOrderDlg->ShowWindow(SW_SHOW);
-		pOrderDlg->MoveWindow(nX, nY, 320, 186);
-		nY += 200;
+		//pOrderDlg->MoveWindow(pt.x, pt.y, 320, 186);
+		//pOrderDlg->SetWindowPos()
+	//	pOrderDlg->SetWindowPos(NULL, 250 + 400, 250, 400, 200, SWP_SHOWWINDOW);
+		//nY += 200;
 		nCount--;
+
+		m_vcOrderDlg.push_back(pOrderDlg);
 	}
 }
 
+void COrderManager::MoveWindow(CRect rcClient)
+{
+	vector<COrderDlg*>::iterator itOrder = m_vcOrderDlg.begin();
+	COrderDlg* ptemp = nullptr;
 
+	CPoint pt(rcClient.TopLeft());
+	for (; itOrder != m_vcOrderDlg.end(); itOrder++)
+	{
+		ptemp = *itOrder;
+		ptemp->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+	}
+
+	vector<CRecvDlg*>::iterator itRecv = m_vcRecvDlg.begin();
+	CRecvDlg* pTempRecv = nullptr;
+	for (; itRecv != m_vcRecvDlg.end(); itRecv++)
+	{
+		pTempRecv = *itRecv;
+		pTempRecv->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+	}
+}

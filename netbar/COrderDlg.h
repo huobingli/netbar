@@ -36,6 +36,7 @@ typedef vector<OrderInfo> vcOrderInfo;
 typedef vcOrderInfo::iterator  itOrderInfo;
 
 class COrderDlg;
+class CRecvDlg;
 struct OrderDlgInfo
 {
 	COrderDlg* m_pOrderDlg;
@@ -68,7 +69,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	DECLARE_MESSAGE_MAP()
-
+	
 	void DrawFirst(CDC* pDC, CRect rcDraw);
 	void DrawSecond(CDC* pDC, CRect rcDraw);
 	void DrawMessage(CDC* pDC, CRect rcDraw);
@@ -77,20 +78,26 @@ protected:
 public:
 	afx_msg void OnBnClickedCancelOrder();
 	afx_msg void OnBnClickedConfirmOrder();
+	afx_msg void OnClose();
+	afx_msg void OnMove(int x, int y);
 
 	//CString GetOrderNum();
 	OrderInfo* m_pOrderInfo;
-	afx_msg void OnClose();
+	
+	
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	void SetParent(CNetbarDlg* pParent);
 private:
-	//CNetbarDlg * m_pParent;
+	CNetbarDlg* m_pParent;
+public:
+	
 };
 
 // 订单管理类
 class COrderManager
 {
 public:
-	COrderManager();
+	COrderManager(CNetbarDlg* pParent);
 	~COrderManager();
 
 
@@ -99,11 +106,16 @@ public:
 
 	void CreateOrderInfo();
 	void ShowOrderInfo();
+	void MoveWindow(CRect rcClient);
 	// 	BOOL DeleteOrder();
 	// 	BOOL DeleteOrder();
 
 private:
+	CNetbarDlg * m_pNetBarDlg;		// 父窗口
+
 	vcOrderInfo		m_vcOrderInfo;
 	//vcOrderDlg		m_vcOrderDlg;	// 订单vc
-	vector<COrderDlg>	m_vcOrderDlg;
+	vector<COrderDlg*>	m_vcOrderDlg;	// 订单数据
+	vector<CRecvDlg*>	m_vcRecvDlg;	// 已接订单数据
+	
 };

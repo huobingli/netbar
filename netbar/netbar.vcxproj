@@ -187,6 +187,9 @@
     <ClInclude Include="CHttpClient.h" />
     <ClInclude Include="CNetBarLoginDlg.h" />
     <ClInclude Include="COrderDlg.h" />
+    <ClInclude Include="CRecviceOrder.h" />
+    <ClInclude Include="CSingleton.h" />
+    <ClInclude Include="CUserInfo.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="json\allocator.h" />
     <ClInclude Include="json\assertions.h" />
@@ -212,6 +215,9 @@
     <ClCompile Include="CHttpClient.cpp" />
     <ClCompile Include="CNetBarLoginDlg.cpp" />
     <ClCompile Include="COrderDlg.cpp" />
+    <ClCompile Include="CRecviceOrder.cpp" />
+    <ClCompile Include="CSingleton.cpp" />
+    <ClCompile Include="CUserInfo.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="json_reader.cpp" />
     <ClCompile Include="json_value.cpp" />
