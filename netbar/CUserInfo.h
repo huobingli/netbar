@@ -5,14 +5,17 @@
 class CUserInfo
 {
 public:
-	CUserInfo(const CString& strName, const CString& strPassword);
+	CUserInfo();
 	~CUserInfo();
 
+	void SetUrlParam(const CString& strName, const CString& strPassword);
 	CString GetUrlParam() { return m_strUrlParam; }
 private:
-	CString m_strName;
+	CString m_strUsername;
 	CString m_strPassword;
 	CString m_strUrlParam;
+
+	CString m_strPasswordMd5;
 };
 
 //typedef CSingleton<CUserInfo> CUserInfo

@@ -106,6 +106,8 @@ public:
 
 	void CreateOrderInfo();
 	void ShowOrderInfo();
+
+	void ShowRecvOrderInfo();
 	void MoveWindow(CRect rcClient);
 	// 	BOOL DeleteOrder();
 	// 	BOOL DeleteOrder();

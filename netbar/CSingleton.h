@@ -19,7 +19,7 @@ template <class TObject>
 class TSingletonHolder
 {
 public:
-	static TObject* Instance(BOOL bCreate = TRUE)
+	static TObject* Instance(bool bCreate = TRUE)
 	{
 		if (m_pInstance == NULL)
 		{

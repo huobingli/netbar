@@ -216,16 +216,10 @@ void COrderManager::ShowOrderInfo()
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
 	CRect rc;
-// 	CWnd* pWnd = AfxGetMainWnd();
-// 	CWnd* pMainWnd = AfxGetApp()->m_pMainWnd;
-// 
-// 	HWND hWnd = AfxGetMainWnd()->GetSafeHwnd();
 	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
 	CPoint pt(rc.TopLeft());
 	int nCount = m_vcOrderInfo.size();
-	//ClientToScreen(AfxGetMainWnd()->GetSafeHwnd(), pt);
-// 	int nX = rc.left + 40;
-// 	int nY = rc.bottom;
+
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
 		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
@@ -233,13 +227,44 @@ void COrderManager::ShowOrderInfo()
 		
 		pOrderDlg->Create(IDD_ORDER_DIALOG, NULL);
 		pOrderDlg->ShowWindow(SW_SHOW);
-		//pOrderDlg->MoveWindow(pt.x, pt.y, 320, 186);
-		//pOrderDlg->SetWindowPos()
-	//	pOrderDlg->SetWindowPos(NULL, 250 + 400, 250, 400, 200, SWP_SHOWWINDOW);
-		//nY += 200;
+
 		nCount--;
 
 		m_vcOrderDlg.push_back(pOrderDlg);
+	}
+}
+
+void COrderManager::ShowRecvOrderInfo()
+{
+
+	CRecvDlg* pRecvDlg = new CRecvDlg();
+	pRecvDlg->SetParent(m_pNetBarDlg);
+
+	pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
+	pRecvDlg->ShowWindow(SW_SHOW);
+
+	//nCount--;
+
+	m_vcRecvDlg.push_back(pRecvDlg);
+	return ;
+
+	vector<CRecvDlg*>::iterator it = m_vcRecvDlg.begin();
+	CRect rc;
+	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
+	CPoint pt(rc.TopLeft());
+	int nCount = m_vcRecvDlg.size();
+
+	for (; it != m_vcRecvDlg.end(); it++)
+	{
+		CRecvDlg* pRecvDlg = new CRecvDlg();
+		pRecvDlg->SetParent(m_pNetBarDlg);
+
+		pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
+		pRecvDlg->ShowWindow(SW_SHOW);
+
+		nCount--;
+
+		m_vcRecvDlg.push_back(pRecvDlg);
 	}
 }
 
@@ -260,6 +285,6 @@ void COrderManager::MoveWindow(CRect rcClient)
 	for (; itRecv != m_vcRecvDlg.end(); itRecv++)
 	{
 		pTempRecv = *itRecv;
-		pTempRecv->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+		pTempRecv->SetWindowPos(NULL, pt.x + 552, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
 	}
 }

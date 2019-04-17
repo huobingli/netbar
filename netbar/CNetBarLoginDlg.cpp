@@ -2,7 +2,7 @@
 #include "CNetBarLoginDlg.h"
 #include "resource.h"
 #include "netbarDlg.h"
-
+#include "CUserInfo.h"
 #include "global.h"
 
 CNetBarLoginDlg::CNetBarLoginDlg(CWnd* pParent /*=NULL*/)
@@ -110,7 +110,8 @@ void CNetBarLoginDlg::OnBnClickedOk()
 			{
 				OnCancel();
 				CNetbarDlg* pNetBarDlg = new CNetbarDlg;
-				pNetBarDlg->SetParam(strUsername, strPassword);
+				CUserInfoHolder::Instance()->SetUrlParam(strUsername, strPassword);
+				//pNetBarDlg->SetParam(strUsername, strPassword);
 				pNetBarDlg->DoModal();
 			}
 			else
