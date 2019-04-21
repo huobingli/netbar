@@ -14,10 +14,14 @@ struct OrderInfo
 	CString			m_strUseTimer;			// 使用时间
 	CString			m_strAdditional;		// 用户要求
 	CString			m_strMessage;			// 用户留言
-	BOOL			m_bShowOrder;			// 订单显示
+	BOOL			m_bShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
+
+	BOOL			m_bUpdate;				// 更新标志
 
 	OrderInfo()
 	{
+		m_bShowOrder = FALSE;
+		m_bUpdate = TRUE;
 	}
 
 	OrderInfo(OrderInfo* pOrderInfo)
@@ -29,6 +33,7 @@ struct OrderInfo
 		m_strAdditional = pOrderInfo->m_strAdditional;
 		m_strMessage = pOrderInfo->m_strMessage;
 		m_bShowOrder = pOrderInfo->m_bShowOrder;
+		m_bUpdate = pOrderInfo->m_bUpdate;
 	}
 };
 
@@ -81,6 +86,10 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnMove(int x, int y);
 
+	CString GetOrderInfoNum() { return m_pOrderInfo->m_strOrderNum; }
+	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
+	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
+	void CloseDlg() { CDialog::OnClose(); }
 	//CString GetOrderNum();
 	OrderInfo* m_pOrderInfo;
 	
@@ -89,6 +98,7 @@ public:
 	void SetParent(CNetbarDlg* pParent);
 private:
 	CNetbarDlg* m_pParent;
+	CFont		m_font;			// 字体
 public:
 	
 };
@@ -100,7 +110,7 @@ public:
 	COrderManager(CNetbarDlg* pParent);
 	~COrderManager();
 
-
+	void ResetOrder();
 	void InsertOrder(OrderInfo pOrderInfo);
 	void DeleteOrder(const CString& strOrderNum);
 
@@ -109,8 +119,14 @@ public:
 
 	void ShowRecvOrderInfo();
 	void MoveWindow(CRect rcClient);
+	void HideOrderDlg(const CString& strOrderNum);
+
+	void UpdateOrderInfo();			// 更新订单信息，对于已经取消的订单
+	void CloseCancelOrder();		// 关闭已经取消的订单
 	// 	BOOL DeleteOrder();
 	// 	BOOL DeleteOrder();
+
+	BOOL IsAlreadyShow(const CString& strOrder);
 
 private:
 	CNetbarDlg * m_pNetBarDlg;		// 父窗口
@@ -120,4 +136,5 @@ private:
 	vector<COrderDlg*>	m_vcOrderDlg;	// 订单数据
 	vector<CRecvDlg*>	m_vcRecvDlg;	// 已接订单数据
 	
+	int				m_nOrderShowCount;	// 实际显示的订单数据
 };

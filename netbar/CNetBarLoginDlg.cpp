@@ -35,7 +35,12 @@ BOOL CNetBarLoginDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-									// TODO: 在此添加额外的初始化代码
+	// TODO: 在此添加额外的初始化代码
+
+	CString strUsername = _T("ywmddjg");
+	SetDlgItemText(IDC_USERNAME_EDIT, strUsername);
+	CString strPassword = _T("888888");
+	SetDlgItemText(IDC_PASSWORD_EDIT, strPassword);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -79,12 +84,23 @@ HCURSOR CNetBarLoginDlg::OnQueryDragIcon()
 // 登录
 void CNetBarLoginDlg::OnBnClickedOk()
 {
-	OnCancel();
-	CNetbarDlg* pNetBarDlg = new CNetbarDlg;
-	//pNetBarDlg->SetParam(strUsername, strPassword);
-	pNetBarDlg->DoModal();
-
-	return;
+	//test
+// 	OnCancel();
+// 	CNetbarDlg* pNetBarDlg = new CNetbarDlg;
+// 	//pNetBarDlg->SetParam(strUsername, strPassword);
+// 	CString strUsername1;
+// 	GetDlgItem(IDC_USERNAME_EDIT)->GetWindowText(strUsername1);
+// 	CString strPassword1;
+// 	GetDlgItem(IDC_PASSWORD_EDIT)->GetWindowText(strPassword1);
+// 	CString strCaption;
+// 	strCaption = _T("当前用户：") + strUsername1 + _T("登陆密码") + strPassword1;
+// 	
+// 	pNetBarDlg->DoModal();
+// // 	pNetBarDlg->ShowWindow(SW_HIDE);
+// // 	//pNetBarDlg->SetWindowText(strCaption);
+// // 	pNetBarDlg->ShowWindow(SW_SHOWNORMAL);
+// 
+// 	return;
 
 	// 请求
 	CHttpClient* pHttpClient = new CHttpClient;
@@ -97,6 +113,7 @@ void CNetBarLoginDlg::OnBnClickedOk()
 	GetDlgItem(IDC_USERNAME_EDIT)->GetWindowText(strUsername);
 	CString strPassword;
 	GetDlgItem(IDC_PASSWORD_EDIT)->GetWindowText(strPassword);
+	
 	strLoginURL.Format(strLoginURL, strUsername, strPassword);
 	if (pHttpClient)
 	{

@@ -3,6 +3,7 @@
 #include "netbarDlg.h"
 #include "resource.h"
 #include "CHttpClient.h"
+#include "CMachineOrder.h"
 
 
 COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
@@ -12,6 +13,9 @@ COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 
 	m_pOrderInfo = new OrderInfo(pOrderInfo);
 	//m_pParent = pParent;
+
+	m_font.CreateFont(15, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
 }
 
 void COrderDlg::DoDataExchange(CDataExchange* pDX)
@@ -58,13 +62,13 @@ void COrderDlg::OnPaint()
 		
 		// 第一行绘制 
 		// 位置  台数  使用时间
-		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 3;
+		rcDraw.bottom = rcDraw.top + rcDlg.Height() / 3;
 		DrawFirst(&dc, rcDraw);
 
 		// 第二行绘制
 		// 用户要求
 		rcDraw.top = rcDraw.bottom;
-		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 3;
+		rcDraw.bottom = rcDraw.top + rcDlg.Height() / 3;
 		DrawSecond(&dc, rcDraw);
 
 		// 第三行绘制
@@ -79,26 +83,32 @@ void COrderDlg::OnPaint()
 
 void COrderDlg::DrawFirst(CDC* pDC, CRect rcDraw)
 {
+	CFont* pFont = pDC->SelectObject(&m_font);
 	pDC->DrawText(m_pOrderInfo->m_strLocate, rcDraw, DT_LEFT);
 	pDC->DrawText(m_pOrderInfo->m_strMachineNum + _T("台"), rcDraw, DT_CENTER);
 	pDC->DrawText(m_pOrderInfo->m_strUseTimer + _T("小时"), rcDraw, DT_RIGHT);
+	pDC->SelectObject(pFont);
 }
 
 void COrderDlg::DrawSecond(CDC* pDC, CRect rcDraw)
 {
+	CFont* pFont = pDC->SelectObject(&m_font);
 	pDC->DrawText(m_pOrderInfo->m_strMessage, rcDraw, DT_LEFT);
+	pDC->SelectObject(pFont);
 }
 
 void COrderDlg::DrawMessage(CDC* pDC, CRect rcDraw)
 {
+	CFont* pFont = pDC->SelectObject(&m_font);
 	pDC->DrawText(m_pOrderInfo->m_strAdditional, rcDraw, DT_LEFT);
+	pDC->SelectObject(pFont);
 }
 
 // 取消订单
 void COrderDlg::OnBnClickedCancelOrder()
 {
 	CString strURL;
-	strURL.LoadString(IDS_STRING_ORDEROP);
+	strURL.LoadString(IDS_STRING_ORDERCANCEL);
 	strURL = strURL +  _T("cancel/") + m_pOrderInfo->m_strOrderNum + _T("?u=") + _T("eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==");
 
 	CHttpClient* pHttpClient = new CHttpClient;
@@ -114,8 +124,12 @@ void COrderDlg::OnBnClickedCancelOrder()
 void COrderDlg::OnBnClickedConfirmOrder()
 {
  	CString strURL;
- 	strURL.LoadString(IDS_STRING_ORDEROP);
+ 	strURL.LoadString(IDS_STRING_ORDERRECV);
  	strURL = strURL + m_pOrderInfo->m_strOrderNum + _T("receive/");
+
+	CMachineOrderDlg pDlg;
+	pDlg.SetMachineCount(3);
+	pDlg.DoModal();
 // 
 // 	CHttpClient* pHttpClient = new CHttpClient;
 // 	LPCTSTR pJsonPostData = _T("");
@@ -133,9 +147,13 @@ void COrderDlg::OnClose()
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
-	//CDialog::OnClose();
+	CDialog::OnClose();
 }
 
+// void COrderDlg::CloseWindow()
+// {
+// 	CDialog::OnCancel();
+// }
 
 BOOL COrderDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -162,6 +180,11 @@ void COrderDlg::SetParent(CNetbarDlg* pParent)
 	m_pParent = pParent;
 }
 
+// BOOL COrderDlg::CloseDlg(const CString& strOrderNum)
+// {
+// 	CDialog::OnCancel()
+// }
+
 // CString CRecvDlg::GetOrderNum()
 // {
 // 	if (m_pOrderInfo)
@@ -185,6 +208,18 @@ COrderManager::~COrderManager()
 
 }
 
+void COrderManager::ResetOrder()
+{
+	itOrderInfo it = m_vcOrderInfo.begin();
+	for (; it != m_vcOrderInfo.end(); it++)
+	{
+// 		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
+// 		{
+// 			m_vcOrderInfo.erase(it);
+// 		}
+		it->m_bUpdate = FALSE;
+	}
+}
 
 void COrderManager::InsertOrder(OrderInfo pOrderInfo)
 {
@@ -194,11 +229,19 @@ void COrderManager::InsertOrder(OrderInfo pOrderInfo)
 void COrderManager::DeleteOrder(const CString& strOrderNum)
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
+	itOrderInfo itDelete;
+
+	OrderInfo* pInfo = nullptr;
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
+		pInfo = &(*it);
+
+		if (pInfo->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
 		{
-			m_vcOrderInfo.erase(it);
+			itDelete = it;
+			m_vcOrderInfo.erase(itDelete);
+
+			return ;
 		}
 	}
 }
@@ -212,36 +255,60 @@ void COrderManager::CreateOrderInfo()
 	}
 }
 
+// 展示订单数据
 void COrderManager::ShowOrderInfo()
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
 	CRect rc;
-	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
+
+	m_pNetBarDlg->GetClientRect(rc);
+	m_pNetBarDlg->ClientToScreen(rc);
 	CPoint pt(rc.TopLeft());
+	
+ 	int nHigh = 130;
+
 	int nCount = m_vcOrderInfo.size();
 
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
-		pOrderDlg->SetParent(m_pNetBarDlg);
-		
-		pOrderDlg->Create(IDD_ORDER_DIALOG, NULL);
-		pOrderDlg->ShowWindow(SW_SHOW);
+		// 如果是新的订单
+		if (it->m_bShowOrder != TRUE)
+		{
+			COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
+			pOrderDlg->SetParent(m_pNetBarDlg);
 
-		nCount--;
+			pOrderDlg->Create(IDD_ORDER_DIALOG, NULL);
+			pOrderDlg->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			pt.y += nHigh;
+			//pOrderDlg->MoveWindow(rcDlg);
+			pOrderDlg->ShowWindow(SW_SHOWNORMAL);
 
-		m_vcOrderDlg.push_back(pOrderDlg);
+			it->m_bShowOrder = TRUE;
+			nCount--;
+			m_nOrderShowCount++;
+			m_vcOrderDlg.push_back(pOrderDlg);
+		}
+		else
+		{
+			if(it->m_bUpdate == FALSE)
+			{			
+				HideOrderDlg(it->m_strOrderNum);
+				m_nOrderShowCount--;
+			}
+		}
 	}
+
+	CloseCancelOrder();
 }
 
+// 展示已接订单
 void COrderManager::ShowRecvOrderInfo()
 {
-
-	CRecvDlg* pRecvDlg = new CRecvDlg();
+	CRecvDlg* pRecvDlg = new CRecvDlg(m_pNetBarDlg);
 	pRecvDlg->SetParent(m_pNetBarDlg);
 
 	pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
-	pRecvDlg->ShowWindow(SW_SHOW);
+	pRecvDlg->ShowWindow(SW_SHOWNORMAL);
 
 	//nCount--;
 
@@ -274,17 +341,106 @@ void COrderManager::MoveWindow(CRect rcClient)
 	COrderDlg* ptemp = nullptr;
 
 	CPoint pt(rcClient.TopLeft());
+	int nHigh = 130;
+
+	CPoint ptOrder(pt);
 	for (; itOrder != m_vcOrderDlg.end(); itOrder++)
 	{
 		ptemp = *itOrder;
-		ptemp->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+		int m = ptemp->IsWindowVisible();
+		if (m)
+		{
+			ptemp->SetWindowPos(NULL, ptOrder.x + 200, ptOrder.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			ptOrder.y += nHigh;
+		}
 	}
 
 	vector<CRecvDlg*>::iterator itRecv = m_vcRecvDlg.begin();
 	CRecvDlg* pTempRecv = nullptr;
+
+	CPoint ptRecv(pt);
 	for (; itRecv != m_vcRecvDlg.end(); itRecv++)
 	{
 		pTempRecv = *itRecv;
-		pTempRecv->SetWindowPos(NULL, pt.x + 552, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+		int n = pTempRecv->IsWindowVisible();
+		if (n)
+		{
+			pTempRecv->SetWindowPos(NULL, ptRecv.x + 552, ptRecv.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+		}
+	}
+}
+
+BOOL COrderManager::IsAlreadyShow(const CString& strOrder)
+{
+	itOrderInfo it = m_vcOrderInfo.begin();
+	for (; it != m_vcOrderInfo.end(); it++)
+	{
+		if (it->m_strOrderNum.CompareNoCase(strOrder) == 0)
+		{
+			it->m_bUpdate = TRUE;
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+void COrderManager::UpdateOrderInfo()
+{
+	itOrderInfo it = m_vcOrderInfo.begin(); 
+	itOrderInfo itDelete;
+	for (; it != m_vcOrderInfo.end(); it++)
+	{
+		if (it->m_bUpdate == FALSE)
+		{
+			itDelete = it;
+			m_vcOrderInfo.erase(itDelete);
+
+			return;
+		}
+	}
+}
+
+void COrderManager::CloseCancelOrder()
+{
+	vector<COrderDlg*>::iterator it = m_vcOrderDlg.begin();
+	CString strNum;
+	COrderDlg* pTmp = nullptr;
+	for (; it != m_vcOrderDlg.end(); it++)
+	{
+		pTmp = *it;
+		strNum = pTmp->GetOrderInfoNum();
+		if (/*strNum.CompareNoCase(strOrderNum)*/pTmp->GetOrderInfoUpdate() == 0)
+		{
+			pTmp->OnClose();
+			m_vcOrderDlg.erase(it);
+			DeleteOrder(strNum);
+
+			if (pTmp)
+			{
+				delete pTmp;
+				pTmp = NULL;
+			}
+
+			return ;
+		}
+	}
+}
+
+void COrderManager::HideOrderDlg(const CString& strOrderNum)
+{
+	vector<COrderDlg*>::iterator it = m_vcOrderDlg.begin();
+	CString strNum;
+	COrderDlg* pTmp = nullptr;
+	for (; it != m_vcOrderDlg.end(); it++)
+	{
+		pTmp = *it;
+		strNum = pTmp->GetOrderInfoNum();
+		if (strNum.CompareNoCase(strOrderNum) == 0)
+		{
+			pTmp->ShowWindow(SW_HIDE);
+			pTmp->SetOrderInfoUpdate(FALSE);
+			return;
+		}
 	}
 }
