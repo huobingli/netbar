@@ -1,5 +1,5 @@
 #pragma once
-
+#include "CRecviceOrder.h"
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -90,6 +90,8 @@ public:
 	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
 	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
 	void CloseDlg() { CDialog::OnClose(); }
+
+	void SetMachineList(const CString& strList) { m_strMachineList = strList; }
 	//CString GetOrderNum();
 	OrderInfo* m_pOrderInfo;
 	
@@ -99,6 +101,8 @@ public:
 private:
 	CNetbarDlg* m_pParent;
 	CFont		m_font;			// 字体
+
+	CString		m_strMachineList;
 public:
 	
 };
@@ -110,31 +114,35 @@ public:
 	COrderManager(CNetbarDlg* pParent);
 	~COrderManager();
 
+	// 订单数据 方法
 	void ResetOrder();
 	void InsertOrder(OrderInfo pOrderInfo);
 	void DeleteOrder(const CString& strOrderNum);
 
-	void CreateOrderInfo();
-	void ShowOrderInfo();
-
-	void ShowRecvOrderInfo();
-	void MoveWindow(CRect rcClient);
-	void HideOrderDlg(const CString& strOrderNum);
-
-	void UpdateOrderInfo();			// 更新订单信息，对于已经取消的订单
-	void CloseCancelOrder();		// 关闭已经取消的订单
-	// 	BOOL DeleteOrder();
-	// 	BOOL DeleteOrder();
-
+//	void CreateOrderInfo();
+	void ShowOrderInfo();								// 显示订单函数
+	void HideOrderDlg(const CString& strOrderNum);		// 先不删除，只是隐藏，之后在进行删除
+	void UpdateOrderInfo();								// 更新订单信息，对于已经取消的订单
+	void CloseCancelOrder();							// 关闭已经取消的订单
+	
 	BOOL IsAlreadyShow(const CString& strOrder);
 
-private:
-	CNetbarDlg * m_pNetBarDlg;		// 父窗口
+	// 接单处理 方法
+	void ShowRecvOrderInfo();
+	void InsertRecvOrder(RecvInfo pRecvInfo);
 
-	vcOrderInfo		m_vcOrderInfo;
-	//vcOrderDlg		m_vcOrderDlg;	// 订单vc
-	vector<COrderDlg*>	m_vcOrderDlg;	// 订单数据
-	vector<CRecvDlg*>	m_vcRecvDlg;	// 已接订单数据
+	// 公用方法
+	void MoveWindow(CRect rcClient);
+private:
+	CNetbarDlg * m_pNetBarDlg;			// 父窗口
+
+	// 订单数据
+	vcOrderInfo		m_vcOrderInfo;		// 订单数据
+	vector<COrderDlg*>	m_vcOrderDlg;	// 订单数据dlg
+
+	// 接单数据
+	vcRecvInfo		m_vcRecvInfo;		// 接单数据
+	vector<CRecvDlg*>	m_vcRecvDlg;	// 已接订单dlg
 	
 	int				m_nOrderShowCount;	// 实际显示的订单数据
 };

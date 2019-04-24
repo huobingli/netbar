@@ -1,6 +1,6 @@
 #include "CMachineOrder.h"
 #include "resource.h"
-
+#include "CHttpClient.h"
 
 CMachineOrderDlg::CMachineOrderDlg(CWnd* pParent /* = NULL */)
 	: CDialog(IDD_MACHINE_DIALOG, pParent)
@@ -14,7 +14,6 @@ CMachineOrderDlg::CMachineOrderDlg(CWnd* pParent /* = NULL */)
 CMachineOrderDlg::~CMachineOrderDlg()
 {
 
-
 }
 
 
@@ -27,6 +26,8 @@ BEGIN_MESSAGE_MAP(CMachineOrderDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDOK, &CMachineOrderDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CMachineOrderDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 BOOL CMachineOrderDlg::OnInitDialog()
@@ -61,4 +62,43 @@ void CMachineOrderDlg::ShowMachineEdit()
 
 		m_vcEdit.push_back(pEdit);
 	}
+}
+
+void CMachineOrderDlg::OnBnClickedOk()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString strMachineList;
+	CString strText;
+	for (int i = 0; i < m_nCount; ++i)
+	{
+		GetDlgItem(ID_EDIT_BEGIN + i)->GetWindowText(strText);
+		strMachineList = strMachineList + strText + _T("+");
+	}
+	
+	strMachineList.TrimRight(_T("+"));
+
+	CString strURL;
+	strURL.LoadString(IDS_STRING_ORDERRECV);
+	strURL = strURL +  + _T("receive/");
+
+	CHttpClient* pHttpClient = new CHttpClient;
+	LPCTSTR pJsonPostData = _T("");
+	CString strResponse;
+	if (pHttpClient)
+	{
+		//pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+	}
+
+
+	m_pParent->SetMachineList(strMachineList);
+
+
+	CDialog::OnOK();
+}
+
+
+void CMachineOrderDlg::OnBnClickedCancel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDialog::OnCancel();
 }

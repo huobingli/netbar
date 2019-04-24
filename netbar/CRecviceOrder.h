@@ -1,5 +1,39 @@
 #pragma once
 #include <afxwin.h>
+#include <vector>
+
+using namespace std;
+
+// 订单信息
+struct RecvInfo
+{
+	CString			m_strOrderNum;			// 订单编号
+	CString			m_strMachineNum;		// 电脑台数
+	CString			m_strMachineList;		// 电脑位置
+	CString			m_strArriveTimer;		// 使用时间
+	BOOL			m_bShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
+
+	BOOL			m_bUpdate;				// 更新标志
+
+	RecvInfo()
+	{
+		m_bShowOrder = FALSE;
+		m_bUpdate = TRUE;
+	}
+
+	RecvInfo(RecvInfo* pRecvInfo)
+	{
+		m_strOrderNum = pRecvInfo->m_strOrderNum;
+		m_strMachineNum = pRecvInfo->m_strMachineNum;
+		m_strMachineList = pRecvInfo->m_strMachineList;
+		m_strArriveTimer = pRecvInfo->m_strArriveTimer;
+		m_bShowOrder = pRecvInfo->m_bShowOrder;
+		m_bUpdate = pRecvInfo->m_bUpdate;
+	}
+};
+
+typedef vector<RecvInfo> vcRecvInfo;
+typedef vcRecvInfo::iterator  itRecvInfo;
 
 class CNetbarDlg;
 class CRecviceOrder
@@ -13,7 +47,7 @@ public:
 class CRecvDlg : public CDialog
 {
 public:
-	CRecvDlg(CWnd* pParent =NULL);
+	CRecvDlg(RecvInfo* pInfo, CWnd* pParent =NULL);
 	~CRecvDlg();
 	// 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -33,6 +67,10 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 
+	void DrawFirst(CDC* pDC, CRect rcDraw);
+	void DrawSecond(CDC* pDC, CRect rcDraw);
+
+
 	void UpdateCountDown(UINT_PTR nIDEvent);
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -43,6 +81,9 @@ private:
 	int		m_nMinute;
 	int		m_nSecond;
 
-	CNetbarDlg * m_pParent;
+	CNetbarDlg *	m_pParent;
+
+	RecvInfo*		m_pRecvInfo;
+	CFont			m_font;
 };
 

@@ -12,11 +12,15 @@ CRecviceOrder::~CRecviceOrder()
 }
 
 
-CRecvDlg::CRecvDlg(CWnd* pParent /*=NULL*/)
+CRecvDlg::CRecvDlg(RecvInfo* pInfo, CWnd* pParent /* =NULL */)
 	: CDialog(IDD_RECV_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
+	m_pRecvInfo = new RecvInfo(pInfo);
+
+	m_font.CreateFont(15, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
 }
 
 CRecvDlg::~CRecvDlg()
@@ -41,13 +45,12 @@ END_MESSAGE_MAP()
 BOOL CRecvDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	m_nHour = 59;
+
+	m_nHour = atoi(m_pRecvInfo->m_strArriveTimer) - 1;
 	m_nMinute = 59;
 	m_nSecond = 59;
 
-
 	SetTimer(TIMER_COUNTDOWN, 1000, NULL);
-	//SetTimer(NULL, TIMER_COUNTDOWN)
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -67,34 +70,69 @@ void CRecvDlg::OnPaint()
  		CRect rcDlg;
  		GetClientRect(rcDlg);
 		CDC* pDC = &dc;
-// 
-// 		rcDlg.bottom -= 40;
-// 		CRect rcDraw(rcDlg);
-// 
-// 		// 第一行绘制 
-// 		// 位置  台数  使用时间
-// 		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 3;
-// 		DrawFirst(&dc, rcDraw);
-// 
-// 		// 第二行绘制
-// 		// 用户要求
-// 		rcDraw.top = rcDraw.bottom;
-// 		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 3;
-// 		DrawSecond(&dc, rcDraw);
-// 
-// 		// 第三行绘制
-// 		// 用户留言
-// 		rcDraw.top = rcDraw.bottom;
-// 		rcDraw.bottom = rcDlg.bottom;
-// 		DrawMessage(&dc, rcDraw);
+ 
+ 		rcDlg.bottom -= 20;
+ 		CRect rcDraw(rcDlg);
+ 
+ 		// 第一行绘制 
+ 		// 位置  台数  使用时间
+ 		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 2;
+ 		DrawFirst(&dc, rcDraw);
+ 
+ 		// 第二行绘制
+ 		// 用户要求
+ 		rcDraw.top = rcDraw.bottom;
+		rcDraw.bottom = rcDlg.bottom;
+ 		DrawSecond(&dc, rcDraw);
 
-		CString str;
-		str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
-		pDC->DrawText(str, rcDlg, DT_LEFT | DT_VCENTER);
+
+// 		CString str;
+// 		str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
+// 		pDC->DrawText(str, rcDlg, DT_LEFT | DT_VCENTER);
 		
 
 		CDialog::OnPaint();
 	}
+}
+
+void CRecvDlg::DrawFirst(CDC* pDC, CRect rcDraw)
+{
+	CRect rcText(rcDraw);
+	
+	CFont* pFont = pDC->SelectObject(&m_font);
+
+	rcText.right = rcText.left + rcDraw.Width() / 3;
+	pDC->DrawText(_T("订单号"), rcText, DT_CENTER | DT_VCENTER);
+
+	rcText.left = rcText.right;
+	rcText.right = rcText.left + rcDraw.Width() / 3;
+	pDC->DrawText(_T("安排机器"), rcText, DT_CENTER | DT_VCENTER);
+
+	rcText.left = rcText.right;
+	rcText.right = rcDraw.right;
+	pDC->DrawText(_T("倒计时"), rcText, DT_CENTER | DT_VCENTER);
+	pDC->SelectObject(pFont);
+}
+
+void CRecvDlg::DrawSecond(CDC* pDC, CRect rcDraw)
+{
+	CRect rcText(rcDraw);
+
+	CFont* pFont = pDC->SelectObject(&m_font);
+
+	rcText.right = rcText.left + rcDraw.Width() / 3;
+	pDC->DrawText(m_pRecvInfo->m_strOrderNum, rcText, DT_CENTER | DT_VCENTER);
+
+	rcText.left = rcText.right;
+	rcText.right = rcText.left + rcDraw.Width() / 3;
+	pDC->DrawText(m_pRecvInfo->m_strMachineList, rcText, DT_CENTER | DT_VCENTER);
+
+	rcText.left = rcText.right;
+	rcText.right = rcDraw.right;
+	CString str;
+	str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
+	pDC->DrawText(str, rcText, DT_CENTER | DT_VCENTER);
+	pDC->SelectObject(pFont);
 }
 
 void CRecvDlg::OnClose()

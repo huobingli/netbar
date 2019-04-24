@@ -127,20 +127,27 @@ void COrderDlg::OnBnClickedConfirmOrder()
  	strURL.LoadString(IDS_STRING_ORDERRECV);
  	strURL = strURL + m_pOrderInfo->m_strOrderNum + _T("receive/");
 
-	CMachineOrderDlg pDlg;
-	pDlg.SetMachineCount(3);
-	pDlg.DoModal();
-// 
-// 	CHttpClient* pHttpClient = new CHttpClient;
-// 	LPCTSTR pJsonPostData = _T("");
-// 	CString strResponse;
-// 	if (pHttpClient)
-// 	{
-// 		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
-// 	}
+ 	CHttpClient* pHttpClient = new CHttpClient;
+ 	LPCTSTR pJsonPostData = _T("");
+ 	CString strResponse;
+ 	if (pHttpClient)
+ 	{
+ 		//pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+ 	}
 
+	CMachineOrderDlg pDlg;
+	pDlg.SetParent(this);
+	pDlg.SetMachineCount(atoi(m_pOrderInfo->m_strMachineNum));
+	pDlg.DoModal();
+
+	RecvInfo rcInfo;
+	rcInfo.m_strOrderNum = m_pOrderInfo->m_strOrderNum;
+	rcInfo.m_strArriveTimer = m_pOrderInfo->m_strUseTimer;
+	rcInfo.m_strMachineNum = m_pOrderInfo->m_strMachineNum;
+	rcInfo.m_strMachineList = m_strMachineList;
+	
 	// 写入到
-	m_pParent->InsertVcRecv();
+	m_pParent->InsertVcRecv(rcInfo);
 }
 
 void COrderDlg::OnClose()
@@ -246,14 +253,14 @@ void COrderManager::DeleteOrder(const CString& strOrderNum)
 	}
 }
 
-void COrderManager::CreateOrderInfo()
-{
-	itOrderInfo it = m_vcOrderInfo.begin();
-	for (; it != m_vcOrderInfo.end(); it++)
-	{
-		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
-	}
-}
+//void COrderManager::CreateOrderInfo()
+//{
+//	itOrderInfo it = m_vcOrderInfo.begin();
+//	for (; it != m_vcOrderInfo.end(); it++)
+//	{
+//		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
+//	}
+//}
 
 // 展示订单数据
 void COrderManager::ShowOrderInfo()
@@ -301,37 +308,50 @@ void COrderManager::ShowOrderInfo()
 	CloseCancelOrder();
 }
 
+void COrderManager::InsertRecvOrder(RecvInfo pRecvInfo)
+{
+	m_vcRecvInfo.push_back(pRecvInfo);
+}
+
 // 展示已接订单
 void COrderManager::ShowRecvOrderInfo()
 {
-	CRecvDlg* pRecvDlg = new CRecvDlg(m_pNetBarDlg);
-	pRecvDlg->SetParent(m_pNetBarDlg);
+	//CRecvDlg* pRecvDlg = new CRecvDlg(m_pNetBarDlg);
+	//pRecvDlg->SetParent(m_pNetBarDlg);
 
-	pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
-	pRecvDlg->ShowWindow(SW_SHOWNORMAL);
+	//pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
+	//pRecvDlg->ShowWindow(SW_SHOWNORMAL);
 
-	//nCount--;
+	////nCount--;
 
-	m_vcRecvDlg.push_back(pRecvDlg);
-	return ;
+	//m_vcRecvDlg.push_back(pRecvDlg);
+	//return ;
 
-	vector<CRecvDlg*>::iterator it = m_vcRecvDlg.begin();
+	itRecvInfo it = m_vcRecvInfo.begin();
 	CRect rc;
 	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
 	CPoint pt(rc.TopLeft());
-	int nCount = m_vcRecvDlg.size();
+	int nCount = m_vcRecvInfo.size();
 
-	for (; it != m_vcRecvDlg.end(); it++)
+	int nHigh = 80;
+	for (; it != m_vcRecvInfo.end(); it++)
 	{
-		CRecvDlg* pRecvDlg = new CRecvDlg();
-		pRecvDlg->SetParent(m_pNetBarDlg);
+		if (it->m_bShowOrder == FALSE)
+		{
+			it->m_bShowOrder = TRUE;
+			CRecvDlg* pRecvDlg = new CRecvDlg(&(*it));
+			pRecvDlg->SetParent(m_pNetBarDlg);
 
-		pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
-		pRecvDlg->ShowWindow(SW_SHOW);
+			pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
 
-		nCount--;
+			pRecvDlg->SetWindowPos(NULL, pt.x + 552, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			pt.y += nHigh;
+			pRecvDlg->ShowWindow(SW_SHOW);
 
-		m_vcRecvDlg.push_back(pRecvDlg);
+			nCount--;
+
+			m_vcRecvDlg.push_back(pRecvDlg);
+		}
 	}
 }
 
