@@ -89,7 +89,6 @@ public:
 	CString GetOrderInfoNum() { return m_pOrderInfo->m_strOrderNum; }
 	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
 	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
-	void CloseDlg() { CDialog::OnClose(); }
 
 	void SetMachineList(const CString& strList) { m_strMachineList = strList; }
 	//CString GetOrderNum();
@@ -130,6 +129,7 @@ public:
 	// 接单处理 方法
 	void ShowRecvOrderInfo();
 	void InsertRecvOrder(RecvInfo pRecvInfo);
+	
 
 	// 公用方法
 	void MoveWindow(CRect rcClient);
@@ -145,4 +145,6 @@ private:
 	vector<CRecvDlg*>	m_vcRecvDlg;	// 已接订单dlg
 	
 	int				m_nOrderShowCount;	// 实际显示的订单数据
+
+	BOOL			m_bTest;
 };

@@ -116,8 +116,10 @@ void COrderDlg::OnBnClickedCancelOrder()
 	CString strResponse;
 	if (pHttpClient)
 	{
-		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+	//	pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
 	}
+	
+	m_pParent->DeleteOrderInfo(m_pOrderInfo->m_strOrderNum);
 }	
 
 // 确认接单
@@ -207,6 +209,8 @@ COrderManager::COrderManager(CNetbarDlg* pParent)
 {
 	m_pNetBarDlg = pParent;
 	//m_vcOrderInfo.clear();
+
+	m_bTest = FALSE;
 }
 
 
@@ -275,12 +279,13 @@ void COrderManager::ShowOrderInfo()
  	int nHigh = 130;
 
 	int nCount = m_vcOrderInfo.size();
-
+	
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
 		// 如果是新的订单
-		if (it->m_bShowOrder != TRUE)
+		if (it->m_bShowOrder != TRUE && m_bTest == FALSE)
 		{
+			m_bTest = TRUE;
 			COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
 			pOrderDlg->SetParent(m_pNetBarDlg);
 
@@ -329,7 +334,8 @@ void COrderManager::ShowRecvOrderInfo()
 
 	itRecvInfo it = m_vcRecvInfo.begin();
 	CRect rc;
-	GetClientRect(AfxGetMainWnd()->GetSafeHwnd(), rc);
+	m_pNetBarDlg->GetClientRect(rc);
+	m_pNetBarDlg->ClientToScreen(rc);
 	CPoint pt(rc.TopLeft());
 	int nCount = m_vcRecvInfo.size();
 
