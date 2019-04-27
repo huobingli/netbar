@@ -4,6 +4,17 @@
 #include <vector>
 using namespace std;
 
+#define ORDERINFO_MASK			0x000F
+// vcOrderInfo
+#define ORDERINFO_NEW			0x0001		// 新订单
+#define ORDERINFO_SHOW			0x0002		// 已经显示的订单
+#define ORDERINFO_DELETE		0x0003		// 不接的订单			有这个属性需要删除info 和dlg
+#define ORDERINFO_REMOVE		0x0004		// 删除的订单			有这个属性需要删除info 和dlg
+
+// vcOrderRecvInfo		对于已接订单的操作
+#define	ORDERINFO_RECV			0x0005		// 已经接的订单			有这个属性
+#define ORDERINFO_ARRIVE		0x0006		// 已经到店的订单
+
 
 // 订单信息
 struct OrderInfo
@@ -14,13 +25,13 @@ struct OrderInfo
 	CString			m_strUseTimer;			// 使用时间
 	CString			m_strAdditional;		// 用户要求
 	CString			m_strMessage;			// 用户留言
-	BOOL			m_bShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
+	DWORD			m_dwShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
 
-	BOOL			m_bUpdate;				// 更新标志
+	BOOL			m_bUpdate;				// 更新标志  订单是否已经显示，TRUE表示已经显示
 
 	OrderInfo()
 	{
-		m_bShowOrder = FALSE;
+		m_dwShowOrder = ORDERINFO_NEW;
 		m_bUpdate = TRUE;
 	}
 
@@ -32,7 +43,7 @@ struct OrderInfo
 		m_strUseTimer = pOrderInfo->m_strUseTimer;
 		m_strAdditional = pOrderInfo->m_strAdditional;
 		m_strMessage = pOrderInfo->m_strMessage;
-		m_bShowOrder = pOrderInfo->m_bShowOrder;
+		m_dwShowOrder = pOrderInfo->m_dwShowOrder;
 		m_bUpdate = pOrderInfo->m_bUpdate;
 	}
 };
@@ -57,8 +68,9 @@ class COrderDlg : public CDialog
 {
 	// 构造
 public:
+	COrderDlg(CWnd* pParent = NULL);	// 标准构造函数
 	COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent = NULL);	// 标准构造函数
-
+	~COrderDlg();
 	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ORDER_DIALOG };
@@ -91,6 +103,8 @@ public:
 	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
 
 	void SetMachineList(const CString& strList) { m_strMachineList = strList; }
+
+	void SetOrderInfo(OrderInfo* pOrderInfo);
 	//CString GetOrderNum();
 	OrderInfo* m_pOrderInfo;
 	

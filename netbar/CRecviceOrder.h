@@ -36,12 +36,12 @@ typedef vector<RecvInfo> vcRecvInfo;
 typedef vcRecvInfo::iterator  itRecvInfo;
 
 class CNetbarDlg;
-class CRecviceOrder
-{
-public:
-	CRecviceOrder();
-	~CRecviceOrder();
-};
+// class CRecviceOrder
+// {
+// public:
+// 	CRecviceOrder();
+// 	~CRecviceOrder();
+// };
 
 #define TIMER_COUNTDOWN	20190410
 class CRecvDlg : public CDialog

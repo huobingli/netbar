@@ -13,7 +13,7 @@ CMachineOrderDlg::CMachineOrderDlg(CWnd* pParent /* = NULL */)
 
 CMachineOrderDlg::~CMachineOrderDlg()
 {
-
+	m_vcEdit.clear();
 }
 
 
@@ -92,6 +92,11 @@ void CMachineOrderDlg::OnBnClickedOk()
 
 	m_pParent->SetMachineList(strMachineList);
 
+	if (pHttpClient)
+	{
+		delete pHttpClient;
+		pHttpClient = NULL;
+	}
 
 	CDialog::OnOK();
 }

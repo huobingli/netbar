@@ -148,6 +148,12 @@ void CNetBarLoginDlg::OnBnClickedOk()
 
 	GetDlgItem(IDC_PASSWORD_EDIT)->SetWindowText(_T(""));
 	GetDlgItem(IDC_PASSWORD_EDIT)->SetFocus();
+
+	if (pHttpClient)
+	{
+		delete pHttpClient;
+		pHttpClient = NULL;
+	}
 }
 
 

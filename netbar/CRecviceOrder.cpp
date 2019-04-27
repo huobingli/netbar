@@ -2,14 +2,14 @@
 #include "resource.h"
 
 
-CRecviceOrder::CRecviceOrder()
-{
-}
-
-
-CRecviceOrder::~CRecviceOrder()
-{
-}
+// CRecviceOrder::CRecviceOrder()
+// {
+// }
+// 
+// 
+// CRecviceOrder::~CRecviceOrder()
+// {
+// }
 
 
 CRecvDlg::CRecvDlg(RecvInfo* pInfo, CWnd* pParent /* =NULL */)
@@ -25,7 +25,11 @@ CRecvDlg::CRecvDlg(RecvInfo* pInfo, CWnd* pParent /* =NULL */)
 
 CRecvDlg::~CRecvDlg()
 {
-
+	if (m_pRecvInfo)
+	{
+		delete m_pRecvInfo;
+		m_pRecvInfo = NULL;
+	}
 }
 
 void CRecvDlg::DoDataExchange(CDataExchange* pDX)
