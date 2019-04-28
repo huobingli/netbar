@@ -6,7 +6,8 @@ using namespace std;
 
 #define ORDERINFO_MASK			0x000F
 // vcOrderInfo
-#define ORDERINFO_NEW			0x0001		// 新订单
+#define ORDERINFO_INIT			0x0000		// 订单的默认状态			请求之后默认为这个属性
+#define ORDERINFO_NEW			0x0001		// 新订单				
 #define ORDERINFO_SHOW			0x0002		// 已经显示的订单
 #define ORDERINFO_DELETE		0x0003		// 不接的订单			有这个属性需要删除info 和dlg
 #define ORDERINFO_REMOVE		0x0004		// 删除的订单			有这个属性需要删除info 和dlg
@@ -27,12 +28,12 @@ struct OrderInfo
 	CString			m_strMessage;			// 用户留言
 	DWORD			m_dwShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
 
-	BOOL			m_bUpdate;				// 更新标志  订单是否已经显示，TRUE表示已经显示
+	//BOOL			m_bUpdate;				// 更新标志  订单是否已经显示，TRUE表示已经显示
 
 	OrderInfo()
 	{
 		m_dwShowOrder = ORDERINFO_NEW;
-		m_bUpdate = TRUE;
+		//m_bUpdate = TRUE;
 	}
 
 	OrderInfo(OrderInfo* pOrderInfo)
@@ -44,7 +45,7 @@ struct OrderInfo
 		m_strAdditional = pOrderInfo->m_strAdditional;
 		m_strMessage = pOrderInfo->m_strMessage;
 		m_dwShowOrder = pOrderInfo->m_dwShowOrder;
-		m_bUpdate = pOrderInfo->m_bUpdate;
+		//m_bUpdate = pOrderInfo->m_bUpdate;
 	}
 };
 
@@ -68,7 +69,7 @@ class COrderDlg : public CDialog
 {
 	// 构造
 public:
-	COrderDlg(CWnd* pParent = NULL);	// 标准构造函数
+//	COrderDlg(CWnd* pParent = NULL);	// 标准构造函数
 	COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent = NULL);	// 标准构造函数
 	~COrderDlg();
 	// 对话框数据
@@ -99,8 +100,11 @@ public:
 	afx_msg void OnMove(int x, int y);
 
 	CString GetOrderInfoNum() { return m_pOrderInfo->m_strOrderNum; }
-	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
-	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
+// 	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
+// 	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
+
+	BOOL GetOrderInfoStatus() { return m_pOrderInfo->m_dwShowOrder; }
+	void SetOrderInfoStatus(DWORD dwStatus) { m_pOrderInfo->m_dwShowOrder = dwStatus; }
 
 	void SetMachineList(const CString& strList) { m_strMachineList = strList; }
 
@@ -135,18 +139,20 @@ public:
 //	void CreateOrderInfo();
 	void ShowOrderInfo();								// 显示订单函数
 	void HideOrderDlg(const CString& strOrderNum);		// 先不删除，只是隐藏，之后在进行删除
-	void UpdateOrderInfo();								// 更新订单信息，对于已经取消的订单
+	//void UpdateOrderInfo();								// 更新订单信息，对于已经取消的订单
 	void CloseCancelOrder();							// 关闭已经取消的订单
 	
-	BOOL IsAlreadyShow(const CString& strOrder);
+	BOOL IsAlreadyInit(const CString& strOrderNum);
 
 	// 接单处理 方法
 	void ShowRecvOrderInfo();
 	void InsertRecvOrder(RecvInfo pRecvInfo);
-	
+
 
 	// 公用方法
 	void MoveWindow(CRect rcClient);
+
+	void SetOrderStatus(const CString& strOrderNum, DWORD dwStatus);
 private:
 	CNetbarDlg * m_pNetBarDlg;			// 父窗口
 

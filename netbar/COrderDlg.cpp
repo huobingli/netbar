@@ -5,14 +5,14 @@
 #include "CHttpClient.h"
 #include "CMachineOrder.h"
 
-COrderDlg::COrderDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(IDD_ORDER_DIALOG, pParent)
-{
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
-	m_font.CreateFont(15, 0, 0, 0, 600,
-		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
-}
+// COrderDlg::COrderDlg(CWnd* pParent /*=NULL*/)
+// 	: CDialog(IDD_ORDER_DIALOG, pParent)
+// {
+// 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+// 
+// 	m_font.CreateFont(15, 0, 0, 0, 600,
+// 		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
+// }
 
 COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_ORDER_DIALOG, pParent)
@@ -176,6 +176,7 @@ void COrderDlg::OnBnClickedConfirmOrder()
 
 		// 写入到
 		m_pParent->InsertVcRecv(rcInfo);
+		m_pParent->SetOrderStatus(m_pOrderInfo->m_strOrderNum, ORDERINFO_RECV);
 
 		CString strURL;
 		strURL.LoadString(IDS_STRING_ORDERRECV);
@@ -195,6 +196,8 @@ void COrderDlg::OnBnClickedConfirmOrder()
 			delete pHttpClient;
 			pHttpClient = NULL;
 		}
+		
+		CDialog::OnOK();
 	}
 }
 
@@ -274,7 +277,7 @@ void COrderManager::ResetOrder()
 // 		{
 // 			m_vcOrderInfo.erase(it);
 // 		}
-//		it->m_bUpdate = FALSE;
+		it->m_dwShowOrder = ORDERINFO_INIT;
 	}
 }
 
@@ -329,21 +332,18 @@ void COrderManager::ShowOrderInfo()
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
 		// 如果是新的订单
-		if (it->m_dwShowOrder == ORDERINFO_NEW /*&& m_bTest == FALSE*/)
+		if (it->m_dwShowOrder == ORDERINFO_NEW)
 		{
 			m_bTest = TRUE;
 			COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
-			//COrderDlg pOrderDlg;
-			pOrderDlg->SetOrderInfo(&(*it));
 			pOrderDlg->SetParent(m_pNetBarDlg);
 
 			pOrderDlg->Create(IDD_ORDER_DIALOG, m_pNetBarDlg);
 			pOrderDlg->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
 			pt.y += nHigh;
-			//pOrderDlg->MoveWindow(rcDlg);
 			pOrderDlg->ShowWindow(SW_SHOWNORMAL);
 
-			it->m_bUpdate = TRUE;
+			//m_pNetBarDlg->SetOrderStatus(it->m_strOrderNum, ORDERINFO_SHOW);
 			it->m_dwShowOrder = ORDERINFO_SHOW;
 			nCount--;
 			m_nOrderShowCount++;
@@ -352,7 +352,7 @@ void COrderManager::ShowOrderInfo()
 		// 老的订单  存在用户取消的情况
 		else
 		{
-			if(it->m_bUpdate == FALSE)
+			if(it->m_dwShowOrder == ORDERINFO_RECV || it->m_dwShowOrder == ORDERINFO_INIT || it->m_dwShowOrder == ORDERINFO_DELETE || it->m_dwShowOrder == ORDERINFO_REMOVE)
 			{			
 				HideOrderDlg(it->m_strOrderNum);
 				m_nOrderShowCount--;
@@ -371,17 +371,6 @@ void COrderManager::InsertRecvOrder(RecvInfo pRecvInfo)
 // 展示已接订单
 void COrderManager::ShowRecvOrderInfo()
 {
-	//CRecvDlg* pRecvDlg = new CRecvDlg(m_pNetBarDlg);
-	//pRecvDlg->SetParent(m_pNetBarDlg);
-
-	//pRecvDlg->Create(IDD_RECV_DIALOG, NULL);
-	//pRecvDlg->ShowWindow(SW_SHOWNORMAL);
-
-	////nCount--;
-
-	//m_vcRecvDlg.push_back(pRecvDlg);
-	//return ;
-
 	itRecvInfo it = m_vcRecvInfo.begin();
 	CRect rc;
 	m_pNetBarDlg->GetClientRect(rc);
@@ -446,15 +435,28 @@ void COrderManager::MoveWindow(CRect rcClient)
 	}
 }
 
-BOOL COrderManager::IsAlreadyShow(const CString& strOrder)
+void COrderManager::SetOrderStatus(const CString& strOrderNum, DWORD dwStatus)
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-		if (it->m_strOrderNum.CompareNoCase(strOrder) == 0)
+		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
 		{
-			if (it->m_bUpdate == TRUE)
+			it->m_dwShowOrder = dwStatus;
+		}
+	}
+}
+
+BOOL COrderManager::IsAlreadyInit(const CString& strOrderNum)
+{
+	itOrderInfo it = m_vcOrderInfo.begin();
+	for (; it != m_vcOrderInfo.end(); it++)
+	{
+		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
+		{
+			if (it->m_dwShowOrder == ORDERINFO_INIT)
 			{
+				it->m_dwShowOrder = ORDERINFO_SHOW;
 				return TRUE;
 			}
 		}
@@ -463,21 +465,21 @@ BOOL COrderManager::IsAlreadyShow(const CString& strOrder)
 	return FALSE;
 }
 
-void COrderManager::UpdateOrderInfo()
-{
-	itOrderInfo it = m_vcOrderInfo.begin(); 
-	itOrderInfo itDelete;
-	for (; it != m_vcOrderInfo.end(); it++)
-	{
-		if (it->m_bUpdate == FALSE)
-		{
-			itDelete = it;
-			m_vcOrderInfo.erase(itDelete);
-
-			return;
-		}
-	}
-}
+// void COrderManager::UpdateOrderInfo()
+// {
+// 	itOrderInfo it = m_vcOrderInfo.begin(); 
+// 	itOrderInfo itDelete;
+// 	for (; it != m_vcOrderInfo.end(); it++)
+// 	{
+// 		if (it->m_bUpdate == FALSE)
+// 		{
+// 			itDelete = it;
+// 			m_vcOrderInfo.erase(itDelete);
+// 
+// 			return;
+// 		}
+// 	}
+// }
 
 void COrderManager::CloseCancelOrder()
 {
@@ -488,12 +490,13 @@ void COrderManager::CloseCancelOrder()
 	{
 		pTmp = *it;
 		strNum = pTmp->GetOrderInfoNum();
-		if (/*strNum.CompareNoCase(strOrderNum)*/pTmp->GetOrderInfoUpdate() == 0)
+		DWORD dwStatus = pTmp->GetOrderInfoStatus();
+		if (/*strNum.CompareNoCase(strOrderNum)*/ dwStatus == ORDERINFO_DELETE || dwStatus == ORDERINFO_REMOVE )// 判断是否需要删除的dlg
 		{
 			pTmp->OnClose();
 			m_vcOrderDlg.erase(it);
 			DeleteOrder(strNum);
-
+			 
 			if (pTmp)
 			{
 				delete pTmp;
@@ -517,7 +520,8 @@ void COrderManager::HideOrderDlg(const CString& strOrderNum)
 		if (strNum.CompareNoCase(strOrderNum) == 0)
 		{
 			pTmp->ShowWindow(SW_HIDE);
-			pTmp->SetOrderInfoUpdate(FALSE);
+			//pTmp->SetOrderInfoUpdate(FALSE);
+			pTmp->SetOrderInfoStatus(ORDERINFO_DELETE);
 			return;
 		}
 	}

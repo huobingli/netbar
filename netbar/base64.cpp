@@ -5,7 +5,7 @@
 #include "base64.h"
 
 std::string Base64::Encode(const unsigned char * str, int bytes) {
-	int num = 0, bin = 0, i;
+	int num = 0, bin = 0;
 	std::string _encode_result;
 	const unsigned char * current;
 	current = str;
