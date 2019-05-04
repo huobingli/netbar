@@ -108,6 +108,7 @@ public:
 private:
 	CNetbarDlg* m_pParent;
 	CFont		m_font;			// ×ÖÌå
+	CFont		m_fontMessage;	
 	OrderInfo*  m_pOrderInfo;
 	CString		m_strMachineList;
 public:

@@ -79,5 +79,6 @@ private:
 
 	RecvInfo*		m_pRecvInfo;
 	CFont			m_font;
+	CFont			m_fontMessage;
 };
 

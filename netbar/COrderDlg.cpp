@@ -14,7 +14,10 @@ COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 	//m_pParent = pParent;
 
 	m_font.CreateFont(15, 0, 0, 0, 600,
-		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("ËÎÌו"));
+
+	m_fontMessage.CreateFont(12, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("ËÎÌו"));
 }
 
 COrderDlg::~COrderDlg()
@@ -65,7 +68,7 @@ void COrderDlg::OnPaint()
 		CRect rcDlg;
 		GetClientRect(rcDlg);
 
-		rcDlg.bottom -= 40;
+		rcDlg.bottom -= 30;
 		CRect rcDraw(rcDlg);
 		
 		dc.SetBkMode(TRANSPARENT);
@@ -113,13 +116,13 @@ void COrderDlg::DrawSecond(CDC* pDC, CRect rcDraw)
 	rcDraw.top = rcDraw.top + 6;
 	rcDraw.left = rcDraw.left + 5;
 	rcDraw.right = rcDraw.right - 5;
-	pDC->DrawText(m_pOrderInfo->m_strAdditional.Mid(10), rcDraw, DT_LEFT);
+	pDC->DrawText(m_pOrderInfo->m_strMessage, rcDraw, DT_LEFT);
 	pDC->SelectObject(pFont);
 }
 
 void COrderDlg::DrawMessage(CDC* pDC, CRect rcDraw)
 {
-	CFont* pFont = pDC->SelectObject(&m_font);
+	CFont* pFont = pDC->SelectObject(&m_fontMessage);
 	rcDraw.top = rcDraw.top + 6;
 	rcDraw.left = rcDraw.left + 5;
 	rcDraw.right = rcDraw.right - 5;

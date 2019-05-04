@@ -19,8 +19,11 @@ CRecvDlg::CRecvDlg(RecvInfo* pInfo, CWnd* pParent /* =NULL */)
 
 	m_pRecvInfo = new RecvInfo(pInfo);
 
-	m_font.CreateFont(15, 0, 0, 0, 600,
-		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
+	m_font.CreateFont(14, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("ËÎÌו"));
+
+	m_fontMessage.CreateFont(12, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("ËÎÌו"));
 }
 
 CRecvDlg::~CRecvDlg()
