@@ -79,21 +79,16 @@ void CRecvDlg::OnPaint()
  		CRect rcDraw(rcDlg);
  
  		// 第一行绘制 
- 		// 位置  台数  使用时间
+		// 绘制信息表头
  		rcDraw.bottom = rcDraw.top + rcDraw.Height() / 2;
  		DrawFirst(&dc, rcDraw);
  
  		// 第二行绘制
- 		// 用户要求
+		// 绘制显示信息
  		rcDraw.top = rcDraw.bottom;
 		rcDraw.bottom = rcDlg.bottom;
  		DrawSecond(&dc, rcDraw);
-
-
-// 		CString str;
-// 		str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
-// 		pDC->DrawText(str, rcDlg, DT_LEFT | DT_VCENTER);
-		
+			
 
 		CDialog::OnPaint();
 	}

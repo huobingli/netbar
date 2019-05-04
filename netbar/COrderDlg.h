@@ -28,12 +28,9 @@ struct OrderInfo
 	CString			m_strMessage;			// 用户留言
 	DWORD			m_dwShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
 
-	//BOOL			m_bUpdate;				// 更新标志  订单是否已经显示，TRUE表示已经显示
-
 	OrderInfo()
 	{
 		m_dwShowOrder = ORDERINFO_NEW;
-		//m_bUpdate = TRUE;
 	}
 
 	OrderInfo(OrderInfo* pOrderInfo)
@@ -45,7 +42,6 @@ struct OrderInfo
 		m_strAdditional = pOrderInfo->m_strAdditional;
 		m_strMessage = pOrderInfo->m_strMessage;
 		m_dwShowOrder = pOrderInfo->m_dwShowOrder;
-		//m_bUpdate = pOrderInfo->m_bUpdate;
 	}
 };
 
@@ -69,7 +65,6 @@ class COrderDlg : public CDialog
 {
 	// 构造
 public:
-//	COrderDlg(CWnd* pParent = NULL);	// 标准构造函数
 	COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent = NULL);	// 标准构造函数
 	~COrderDlg();
 	// 对话框数据
@@ -100,8 +95,6 @@ public:
 	afx_msg void OnMove(int x, int y);
 
 	CString GetOrderInfoNum() { return m_pOrderInfo->m_strOrderNum; }
-// 	BOOL GetOrderInfoUpdate() { return m_pOrderInfo->m_bUpdate; }
-// 	void SetOrderInfoUpdate(BOOL bUpdate) { m_pOrderInfo->m_bUpdate = bUpdate; }
 
 	BOOL GetOrderInfoStatus() { return m_pOrderInfo->m_dwShowOrder; }
 	void SetOrderInfoStatus(DWORD dwStatus) { m_pOrderInfo->m_dwShowOrder = dwStatus; }
@@ -109,16 +102,13 @@ public:
 	void SetMachineList(const CString& strList) { m_strMachineList = strList; }
 
 	void SetOrderInfo(OrderInfo* pOrderInfo);
-	//CString GetOrderNum();
-	OrderInfo* m_pOrderInfo;
-	
 	
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void SetParent(CNetbarDlg* pParent);
 private:
 	CNetbarDlg* m_pParent;
 	CFont		m_font;			// 字体
-
+	OrderInfo*  m_pOrderInfo;
 	CString		m_strMachineList;
 public:
 	
@@ -136,10 +126,9 @@ public:
 	void InsertOrder(OrderInfo pOrderInfo);
 	void DeleteOrder(const CString& strOrderNum);
 
-//	void CreateOrderInfo();
 	void ShowOrderInfo();								// 显示订单函数
 	void HideOrderDlg(const CString& strOrderNum);		// 先不删除，只是隐藏，之后在进行删除
-	//void UpdateOrderInfo();								// 更新订单信息，对于已经取消的订单
+	
 	void CloseCancelOrder();							// 关闭已经取消的订单
 	
 	BOOL IsAlreadyInit(const CString& strOrderNum);

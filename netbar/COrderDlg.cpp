@@ -5,15 +5,6 @@
 #include "CHttpClient.h"
 #include "CMachineOrder.h"
 
-// COrderDlg::COrderDlg(CWnd* pParent /*=NULL*/)
-// 	: CDialog(IDD_ORDER_DIALOG, pParent)
-// {
-// 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-// 
-// 	m_font.CreateFont(15, 0, 0, 0, 600,
-// 		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("Arial"));
-// }
-
 COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_ORDER_DIALOG, pParent)
 {
@@ -208,11 +199,6 @@ void COrderDlg::OnClose()
 	CDialog::OnClose();
 }
 
-// void COrderDlg::CloseWindow()
-// {
-// 	CDialog::OnCancel();
-// }
-
 BOOL COrderDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 在此添加专用代码和/或调用基类
@@ -238,20 +224,6 @@ void COrderDlg::SetParent(CNetbarDlg* pParent)
 	m_pParent = pParent;
 }
 
-// BOOL COrderDlg::CloseDlg(const CString& strOrderNum)
-// {
-// 	CDialog::OnCancel()
-// }
-
-// CString CRecvDlg::GetOrderNum()
-// {
-// 	if (m_pOrderInfo)
-// 	{
-// 		m_pOrderInfo->m_strOrderNum;
-// 	}
-// }
-
-
 //////////////////////////////////////////////////////////////////////////
 /// COrderManager 
 COrderManager::COrderManager(CNetbarDlg* pParent)
@@ -273,10 +245,6 @@ void COrderManager::ResetOrder()
 	itOrderInfo it = m_vcOrderInfo.begin();
 	for (; it != m_vcOrderInfo.end(); it++)
 	{
-// 		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
-// 		{
-// 			m_vcOrderInfo.erase(it);
-// 		}
 		it->m_dwShowOrder = ORDERINFO_INIT;
 	}
 }
@@ -306,15 +274,6 @@ void COrderManager::DeleteOrder(const CString& strOrderNum)
 	}
 }
 
-//void COrderManager::CreateOrderInfo()
-//{
-//	itOrderInfo it = m_vcOrderInfo.begin();
-//	for (; it != m_vcOrderInfo.end(); it++)
-//	{
-//		COrderDlg* pOrderDlg = new COrderDlg(&(*it));
-//	}
-//}
-
 // 展示订单数据
 void COrderManager::ShowOrderInfo()
 {
@@ -343,7 +302,6 @@ void COrderManager::ShowOrderInfo()
 			pt.y += nHigh;
 			pOrderDlg->ShowWindow(SW_SHOWNORMAL);
 
-			//m_pNetBarDlg->SetOrderStatus(it->m_strOrderNum, ORDERINFO_SHOW);
 			it->m_dwShowOrder = ORDERINFO_SHOW;
 			nCount--;
 			m_nOrderShowCount++;
@@ -465,22 +423,6 @@ BOOL COrderManager::IsAlreadyInit(const CString& strOrderNum)
 	return FALSE;
 }
 
-// void COrderManager::UpdateOrderInfo()
-// {
-// 	itOrderInfo it = m_vcOrderInfo.begin(); 
-// 	itOrderInfo itDelete;
-// 	for (; it != m_vcOrderInfo.end(); it++)
-// 	{
-// 		if (it->m_bUpdate == FALSE)
-// 		{
-// 			itDelete = it;
-// 			m_vcOrderInfo.erase(itDelete);
-// 
-// 			return;
-// 		}
-// 	}
-// }
-
 void COrderManager::CloseCancelOrder()
 {
 	vector<COrderDlg*>::iterator it = m_vcOrderDlg.begin();
@@ -491,7 +433,7 @@ void COrderManager::CloseCancelOrder()
 		pTmp = *it;
 		strNum = pTmp->GetOrderInfoNum();
 		DWORD dwStatus = pTmp->GetOrderInfoStatus();
-		if (/*strNum.CompareNoCase(strOrderNum)*/ dwStatus == ORDERINFO_DELETE || dwStatus == ORDERINFO_REMOVE )// 判断是否需要删除的dlg
+		if (dwStatus == ORDERINFO_DELETE || dwStatus == ORDERINFO_REMOVE )// 判断是否需要删除的dlg
 		{
 			pTmp->OnClose();
 			m_vcOrderDlg.erase(it);
@@ -520,7 +462,6 @@ void COrderManager::HideOrderDlg(const CString& strOrderNum)
 		if (strNum.CompareNoCase(strOrderNum) == 0)
 		{
 			pTmp->ShowWindow(SW_HIDE);
-			//pTmp->SetOrderInfoUpdate(FALSE);
 			pTmp->SetOrderInfoStatus(ORDERINFO_DELETE);
 			return;
 		}
