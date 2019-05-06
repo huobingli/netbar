@@ -55,8 +55,11 @@ void CMachineOrderDlg::ShowMachineEdit()
 	for (int i = 0; i < m_nCount; ++i)
 	{
 		CEdit* pEdit = new CEdit;
-
 		pEdit->Create(WS_VISIBLE | WS_CHILD | WS_BORDER | WS_EX_STATICEDGE, rc ,this,ID_EDIT_BEGIN + i);
+
+		DWORD dwStyle = ::GetWindowLong(pEdit->GetSafeHwnd(), GWL_STYLE);
+		dwStyle |= ES_NUMBER;
+		::SetWindowLong(pEdit->GetSafeHwnd(), GWL_STYLE, dwStyle);
 		pEdit->ShowWindow(SW_SHOW); 
 		rc.OffsetRect(nSpace, 0);
 
