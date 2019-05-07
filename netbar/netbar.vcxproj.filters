@@ -99,6 +99,9 @@
     <ClInclude Include="CMachineOrder.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CMusicPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="netbar.cpp">
@@ -149,6 +152,9 @@
     <ClCompile Include="CMachineOrder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CMusicPlayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="netbar.rc">
@@ -176,5 +182,10 @@
     <Image Include="res\sound.bmp">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="C:\Windows\Media\Alarm01.wav">
+      <Filter>资源文件</Filter>
+    </Media>
   </ItemGroup>
 </Project>

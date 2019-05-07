@@ -143,6 +143,9 @@ public:
 	void MoveWindow(CRect rcClient);
 
 	void SetOrderStatus(const CString& strOrderNum, DWORD dwStatus);
+
+	// 是否有新订单
+	BOOL IsHasNewOrder() { return m_bNewOrder; }
 private:
 	CNetbarDlg * m_pNetBarDlg;			// 父窗口
 
@@ -156,5 +159,5 @@ private:
 	
 	int				m_nOrderShowCount;	// 实际显示的订单数据
 
-	BOOL			m_bTest;
+	BOOL			m_bNewOrder;		// 是否有新订单
 };

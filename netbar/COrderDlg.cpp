@@ -152,6 +152,8 @@ void COrderDlg::OnBnClickedCancelOrder()
 		delete pHttpClient;
 		pHttpClient = NULL;
 	}
+	
+	CDialog::OnOK();
 }	
 
 // 确认接单
@@ -234,7 +236,7 @@ COrderManager::COrderManager(CNetbarDlg* pParent)
 	m_pNetBarDlg = pParent;
 	//m_vcOrderInfo.clear();
 
-	m_bTest = FALSE;
+	m_bNewOrder = FALSE;
 }
 
 
@@ -255,6 +257,7 @@ void COrderManager::ResetOrder()
 void COrderManager::InsertOrder(OrderInfo pOrderInfo)
 {
 	m_vcOrderInfo.push_back(pOrderInfo);
+	m_bNewOrder = TRUE;
 }
 
 void COrderManager::DeleteOrder(const CString& strOrderNum)
@@ -296,7 +299,7 @@ void COrderManager::ShowOrderInfo()
 		// 如果是新的订单
 		if (it->m_dwShowOrder == ORDERINFO_NEW)
 		{
-			m_bTest = TRUE;
+			//m_bTest = TRUE;
 			COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
 			pOrderDlg->SetParent(m_pNetBarDlg);
 
