@@ -65,6 +65,7 @@ class COrderDlg : public CDialog
 {
 	// 构造
 public:
+	COrderDlg(CWnd* pParent = NULL);	// 标准构造函数
 	COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent = NULL);	// 标准构造函数
 	~COrderDlg();
 	// 对话框数据
@@ -146,6 +147,7 @@ public:
 
 	// 是否有新订单
 	BOOL IsHasNewOrder() { return m_bNewOrder; }
+	void SetNewOrder(BOOL bFlag) { m_bNewOrder = bFlag; }
 private:
 	CNetbarDlg * m_pNetBarDlg;			// 父窗口
 

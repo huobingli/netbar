@@ -13,6 +13,9 @@ public:
 
 	void SetNetBarInfo(const CString& strName) { m_strNetInfo = strName; }
 	CString GetNetBarInfo() { return m_strNetInfo; }
+
+	void SetStaffInfo(const CString& strStaffID) { m_strStaffID = strStaffID; }
+	CString GetStaffInfo() { return m_strStaffID; }
 private:
 	CString m_strUsername;
 	CString m_strPassword;
@@ -21,6 +24,8 @@ private:
 	CString m_strPasswordMd5;
 
 	CString m_strNetInfo;
+
+	CString m_strStaffID;
 };
 
 //typedef CSingleton<CUserInfo> CUserInfo

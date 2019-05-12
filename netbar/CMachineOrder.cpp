@@ -75,31 +75,31 @@ void CMachineOrderDlg::OnBnClickedOk()
 	for (int i = 0; i < m_nCount; ++i)
 	{
 		GetDlgItem(ID_EDIT_BEGIN + i)->GetWindowText(strText);
-		strMachineList = strMachineList + strText + _T("+");
+		strMachineList = strMachineList + strText + _T(",");
 	}
 	
-	strMachineList.TrimRight(_T("+"));
+	strMachineList.TrimRight(_T(","));
 
-	CString strURL;
-	strURL.LoadString(IDS_STRING_ORDERRECV);
-	strURL = strURL +  + _T("receive/");
-
-	CHttpClient* pHttpClient = new CHttpClient;
-	LPCTSTR pJsonPostData = _T("");
-	CString strResponse;
-	if (pHttpClient)
-	{
-		//pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
-	}
+// 	CString strURL;
+// 	strURL.LoadString(IDS_STRING_ORDERRECV);
+// 	strURL = strURL +  + _T("receive/");
+// 
+// 	CHttpClient* pHttpClient = new CHttpClient;
+// 	LPCTSTR pJsonPostData = _T("");
+// 	CString strResponse;
+// 	if (pHttpClient)
+// 	{
+// 		//pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+// 	}
 
 
 	m_pParent->SetMachineList(strMachineList);
 
-	if (pHttpClient)
-	{
-		delete pHttpClient;
-		pHttpClient = NULL;
-	}
+// 	if (pHttpClient)
+// 	{
+// 		delete pHttpClient;
+// 		pHttpClient = NULL;
+// 	}
 
 	CDialog::OnOK();
 }

@@ -4,6 +4,19 @@
 #include "resource.h"
 #include "CHttpClient.h"
 #include "CMachineOrder.h"
+#include "CUserInfo.h"
+
+COrderDlg::COrderDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(IDD_ORDER_DIALOG, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_font.CreateFont(15, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("宋体"));
+
+	m_fontMessage.CreateFont(12, 0, 0, 0, 600,
+		FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, _T("宋体"));
+}
 
 COrderDlg::COrderDlg(OrderInfo* pOrderInfo, CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_ORDER_DIALOG, pParent)
@@ -133,16 +146,18 @@ void COrderDlg::DrawMessage(CDC* pDC, CRect rcDraw)
 // 取消订单
 void COrderDlg::OnBnClickedCancelOrder()
 {
+	// http://api.ljgzh.com/order/op/cancel/365?u=eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==&staff_id=16
+	// http://api.ljgzh.com/order/op/cancel/%s/u=%s&staff_id=%s
 	CString strURL;
-	strURL.LoadString(IDS_STRING_ORDERCANCEL);
-	strURL = strURL +  _T("cancel/") + m_pOrderInfo->m_strOrderNum + _T("?u=") + _T("eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==");
+	strURL.LoadString(IDS_STRING_ORDERCANCEL1);
+	strURL.Format(strURL, m_pOrderInfo->m_strOrderNum, CUserInfoHolder::Instance()->GetUrlParam(), CUserInfoHolder::Instance()->GetStaffInfo());
 
 	CHttpClient* pHttpClient = new CHttpClient;
 	LPCTSTR pJsonPostData = _T("");
 	CString strResponse;
 	if (pHttpClient)
 	{
-	//	pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+		pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
 	}
 	
 	m_pParent->DeleteOrderInfo(m_pOrderInfo->m_strOrderNum);
@@ -174,16 +189,19 @@ void COrderDlg::OnBnClickedConfirmOrder()
 		m_pParent->InsertVcRecv(rcInfo);
 		m_pParent->SetOrderStatus(m_pOrderInfo->m_strOrderNum, ORDERINFO_RECV);
 
+		// http://api.ljgzh.com/order/op/receive/370?u=eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==&staff_id=16&seats=1,2
+		// http://api.ljgzh.com/order/op/receive/%s/u=%s&staff_id=%s&seats=%s
+		
 		CString strURL;
 		strURL.LoadString(IDS_STRING_ORDERRECV);
-		strURL = strURL + m_pOrderInfo->m_strOrderNum + _T("receive/");
+		strURL.Format(strURL, m_pOrderInfo->m_strOrderNum,  CUserInfoHolder::Instance()->GetUrlParam(), CUserInfoHolder::Instance()->GetStaffInfo(), m_strMachineList);
 
 		CHttpClient* pHttpClient = new CHttpClient;
 		LPCTSTR pJsonPostData = _T("");
 		CString strResponse;
 		if (pHttpClient)
 		{
-			//pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
+			pHttpClient->HttpPost(strURL, pJsonPostData, strResponse);
 		}
 
 		// 删除
@@ -299,16 +317,17 @@ void COrderManager::ShowOrderInfo()
 		// 如果是新的订单
 		if (it->m_dwShowOrder == ORDERINFO_NEW)
 		{
-			//m_bTest = TRUE;
-			COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
+			//COrderDlg* pOrderDlg = new COrderDlg(&(*it), m_pNetBarDlg);
+			COrderDlg* pOrderDlg = new COrderDlg(m_pNetBarDlg);
 			pOrderDlg->SetParent(m_pNetBarDlg);
+			it->m_dwShowOrder = ORDERINFO_SHOW;
+			pOrderDlg->SetOrderInfo(&(*it));
 
 			pOrderDlg->Create(IDD_ORDER_DIALOG, m_pNetBarDlg);
 			pOrderDlg->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
-			pt.y += nHigh;
+			pt.y += nHigh;// *m_vcOrderDlg.size();
 			pOrderDlg->ShowWindow(SW_SHOWNORMAL);
-
-			it->m_dwShowOrder = ORDERINFO_SHOW;
+			
 			nCount--;
 			m_nOrderShowCount++;
 			m_vcOrderDlg.push_back(pOrderDlg);
@@ -452,6 +471,14 @@ void COrderManager::CloseCancelOrder()
 			}
 
 			return ;
+		}
+		else if (dwStatus == ORDERINFO_SHOW)
+		{
+			CRect rc;
+			pTmp->GetClientRect(rc);
+			pTmp->ClientToScreen(rc);
+			pTmp->InvalidateRect(rc, TRUE);
+			pTmp->UpdateWindow();
 		}
 	}
 }
