@@ -27,7 +27,7 @@ BEGIN_MESSAGE_MAP(CMachineOrderDlg, CDialog)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDOK, &CMachineOrderDlg::OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL, &CMachineOrderDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(ID_REEDIT, &CMachineOrderDlg::OnBnClickedReedit)
 END_MESSAGE_MAP()
 
 BOOL CMachineOrderDlg::OnInitDialog()
@@ -105,8 +105,11 @@ void CMachineOrderDlg::OnBnClickedOk()
 }
 
 
-void CMachineOrderDlg::OnBnClickedCancel()
+void CMachineOrderDlg::OnBnClickedReedit()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CDialog::OnCancel();
+	for (int i = 0; i < m_nCount; ++i)
+	{
+		GetDlgItem(ID_EDIT_BEGIN + i)->SetWindowText(_T(""));
+	}
 }

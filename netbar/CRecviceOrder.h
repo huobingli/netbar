@@ -4,6 +4,13 @@
 
 using namespace std;
 
+//
+#define RECVINFO_INIT			0x0000		// 订单的默认状态	
+#define RECVINFO_NEW			0x0001		// 已接新订单				
+#define RECVINFO_SHOW			0x0002		// 已接显示的订单
+#define RECVINFO_OVERTIME		0x0003		// 已接订单超期
+
+
 // 订单信息
 struct RecvInfo
 {
@@ -11,13 +18,13 @@ struct RecvInfo
 	CString			m_strMachineNum;		// 电脑台数
 	CString			m_strMachineList;		// 电脑位置
 	CString			m_strArriveTimer;		// 使用时间
-	BOOL			m_bShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
+	DWORD			m_dwShowOrder;			// 订单显示 新订单为FALSE  显示之后的新订单为TRUE
 
 	BOOL			m_bUpdate;				// 更新标志
 
 	RecvInfo()
 	{
-		m_bShowOrder = FALSE;
+		m_dwShowOrder = RECVINFO_INIT;
 		m_bUpdate = TRUE;
 	}
 
@@ -27,7 +34,7 @@ struct RecvInfo
 		m_strMachineNum = pRecvInfo->m_strMachineNum;
 		m_strMachineList = pRecvInfo->m_strMachineList;
 		m_strArriveTimer = pRecvInfo->m_strArriveTimer;
-		m_bShowOrder = pRecvInfo->m_bShowOrder;
+		m_dwShowOrder = pRecvInfo->m_dwShowOrder;
 		m_bUpdate = pRecvInfo->m_bUpdate;
 	}
 };
@@ -65,20 +72,23 @@ protected:
 	void DrawSecond(CDC* pDC, CRect rcDraw);
 
 
-	void UpdateCountDown(UINT_PTR nIDEvent);
+	void UpdateCountDown(UINT_PTR nIDEvent);	
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void SetParent(CNetbarDlg* pParent);
-
+	DWORD GetRecvInfoStatus() { return m_pRecvInfo->m_dwShowOrder; }
+	CString GetOrderInfoNum() { return m_pRecvInfo->m_strOrderNum; }
 private:
 	int		m_nHour;
 	int		m_nMinute;
 	int		m_nSecond;
 
-	CNetbarDlg *	m_pParent;
+	CNetbarDlg*		m_pParent;
 
 	RecvInfo*		m_pRecvInfo;
 	CFont			m_font;
 	CFont			m_fontMessage;
+public:
+	afx_msg void OnBnClickedCancelDaodian();
 };
 

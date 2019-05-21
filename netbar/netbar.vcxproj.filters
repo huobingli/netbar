@@ -187,5 +187,8 @@
     <Media Include="C:\Windows\Media\Alarm01.wav">
       <Filter>资源文件</Filter>
     </Media>
+    <Media Include="res\Alarm01.wav">
+      <Filter>资源文件</Filter>
+    </Media>
   </ItemGroup>
 </Project>

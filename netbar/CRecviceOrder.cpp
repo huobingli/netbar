@@ -1,5 +1,6 @@
 #include "CRecviceOrder.h"
 #include "resource.h"
+#include "netbarDlg.h"
 
 
 // CRecviceOrder::CRecviceOrder()
@@ -44,6 +45,7 @@ BEGIN_MESSAGE_MAP(CRecvDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(ID_CANCEL_DAODIAN, &CRecvDlg::OnBnClickedCancelDaodian)
 END_MESSAGE_MAP()
 
 
@@ -56,6 +58,10 @@ BOOL CRecvDlg::OnInitDialog()
 	m_nHour = atoi(m_pRecvInfo->m_strArriveTimer) - 1;
 	m_nMinute = 59;
 	m_nSecond = 59;
+
+// 	m_nHour = 0;// atoi(m_pRecvInfo->m_strArriveTimer) - 1;
+// 	m_nMinute = 0;
+// 	m_nSecond = 10;
 
 	SetTimer(TIMER_COUNTDOWN, 1000, NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -79,6 +85,7 @@ void CRecvDlg::OnPaint()
 		CDC* pDC = &dc;
  
  		rcDlg.bottom -= 20;
+		rcDlg.top += 4;
  		CRect rcDraw(rcDlg);
  
  		// 第一行绘制 
@@ -132,7 +139,14 @@ void CRecvDlg::DrawSecond(CDC* pDC, CRect rcDraw)
 	rcText.left = rcText.right;
 	rcText.right = rcDraw.right;
 	CString str;
-	str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
+	if ((m_nHour == 0 && m_nMinute == 0 && m_nSecond == 0 ) || (m_pRecvInfo->m_dwShowOrder == RECVINFO_OVERTIME))
+	{
+		str = _T("已经超时");
+	}
+	else
+	{
+		str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
+	}	
 	pDC->DrawText(str, rcText, DT_CENTER | DT_VCENTER);
 	pDC->SelectObject(pFont);
 }
@@ -181,26 +195,72 @@ void CRecvDlg::UpdateCountDown(UINT_PTR nIDEvent)
 	///*static*/ int nSecond = MAX_VALUE;
 	--m_nSecond;
 
+// 	if (!m_nSecond)
+// 	{
+// 		--m_nMinute;
+// 		if (!m_nMinute)
+// 		{
+// 			--m_nHour;
+// 			if (!m_nHour)
+// 			{
+// 				//SetDlgItemText(IDC_EDIT1, _T("00 : 00 : 00"));
+// 				//::SetDlgItemText(AfxGetMainWnd()->m_hWnd, IDC_EDIT1, strTime);
+// 				KillTimer(nIDEvent);
+// 				//AfxMessageBox(_T("Game Over!"));
+// 				return;
+// 			}
+// 			m_nMinute = MAX_VALUE;
+// 		}		
+// 		m_nSecond = MAX_VALUE;
+// 	}
+
 	if (!m_nSecond)
 	{
-		--m_nMinute;
 		if (!m_nMinute)
-		{
-			--m_nHour;
+		{	
 			if (!m_nHour)
 			{
+				
 				//SetDlgItemText(IDC_EDIT1, _T("00 : 00 : 00"));
 				//::SetDlgItemText(AfxGetMainWnd()->m_hWnd, IDC_EDIT1, strTime);
 				KillTimer(nIDEvent);
-				AfxMessageBox(_T("Game Over!"));
+				m_nSecond = 0;
+				m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
+				Invalidate(TRUE);
+				//AfxMessageBox(_T("Game Over!"));
 				return;
 			}
+			else
+			{
+				--m_nHour;
+			}
 			m_nMinute = MAX_VALUE;
+		}
+		else
+		{
+			--m_nMinute;
 		}
 		m_nSecond = MAX_VALUE;
 	}
 
 	Invalidate(TRUE);
-	//str.Format(_T("%02d : %02d : %02d"), m_nHour, m_nMinute, m_nSecond);
-	//SetDlgItemText(IDC_EDIT1, str);
+}
+
+
+void CRecvDlg::OnBnClickedCancelDaodian()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	if (m_nSecond != 0 || m_nMinute != 0 || m_nHour != 0)
+	{
+		AfxMessageBox(_T("此订单还未超时"));
+		return;
+	}
+
+	m_pParent->DeleteRecvInfo(m_pRecvInfo->m_strOrderNum);
+	m_pParent->SetRecvStatus(m_pRecvInfo->m_strOrderNum, RECVINFO_OVERTIME);
+	m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
+
+	m_pParent->UpdateRecvInfo();
+	CDialog::OnOK();
 }

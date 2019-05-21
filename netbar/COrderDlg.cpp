@@ -161,6 +161,8 @@ void COrderDlg::OnBnClickedCancelOrder()
 	}
 	
 	m_pParent->DeleteOrderInfo(m_pOrderInfo->m_strOrderNum);
+	m_pParent->SetOrderStatus(m_pOrderInfo->m_strOrderNum, ORDERINFO_DELETE);
+	m_pOrderInfo->m_dwShowOrder = ORDERINFO_DELETE;
 
 	if (pHttpClient)
 	{
@@ -168,6 +170,8 @@ void COrderDlg::OnBnClickedCancelOrder()
 		pHttpClient = NULL;
 	}
 	
+	m_pParent->UpdateOrderInfo();
+
 	CDialog::OnOK();
 }	
 
@@ -188,6 +192,7 @@ void COrderDlg::OnBnClickedConfirmOrder()
 		// 写入到
 		m_pParent->InsertVcRecv(rcInfo);
 		m_pParent->SetOrderStatus(m_pOrderInfo->m_strOrderNum, ORDERINFO_RECV);
+		m_pOrderInfo->m_dwShowOrder = ORDERINFO_RECV;
 
 		// http://api.ljgzh.com/order/op/receive/370?u=eXdtZGRqZysyMTIxOGNjYTc3ODA0ZDJiYTE5MjJjMzNlMDE1MTEwNQ==&staff_id=16&seats=1,2
 		// http://api.ljgzh.com/order/op/receive/%s/u=%s&staff_id=%s&seats=%s
@@ -210,6 +215,8 @@ void COrderDlg::OnBnClickedConfirmOrder()
 			delete pHttpClient;
 			pHttpClient = NULL;
 		}
+
+		m_pParent->UpdateOrderInfo();
 		
 		CDialog::OnOK();
 	}
@@ -253,7 +260,7 @@ COrderManager::COrderManager(CNetbarDlg* pParent)
 {
 	m_pNetBarDlg = pParent;
 	//m_vcOrderInfo.clear();
-
+	m_nOrderShowCount = 0;
 	m_bNewOrder = FALSE;
 }
 
@@ -324,11 +331,10 @@ void COrderManager::ShowOrderInfo()
 			pOrderDlg->SetOrderInfo(&(*it));
 
 			pOrderDlg->Create(IDD_ORDER_DIALOG, m_pNetBarDlg);
-			pOrderDlg->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
-			pt.y += nHigh;// *m_vcOrderDlg.size();
+			
+			pOrderDlg->SetWindowPos(NULL, pt.x + 200, pt.y + nHigh * m_nOrderShowCount + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
 			pOrderDlg->ShowWindow(SW_SHOWNORMAL);
 			
-			nCount--;
 			m_nOrderShowCount++;
 			m_vcOrderDlg.push_back(pOrderDlg);
 		}
@@ -346,6 +352,113 @@ void COrderManager::ShowOrderInfo()
 	CloseCancelOrder();
 }
 
+void COrderManager::UpdateOrderInfo()
+{
+	CRect rc;
+	m_pNetBarDlg->GetClientRect(rc);
+	m_pNetBarDlg->ClientToScreen(rc);
+	CPoint pt(rc.TopLeft());
+
+	vector<COrderDlg*>::iterator it = m_vcOrderDlg.begin();
+	COrderDlg* pTmp = nullptr;
+
+	// 接单
+	int nHigh = 130;
+	for (; it != m_vcOrderDlg.end(); it++)
+	{
+		pTmp = *it;
+		DWORD dwStatus = pTmp->GetOrderInfoStatus();
+		if (dwStatus == ORDERINFO_SHOW)
+		{
+			pTmp->SetWindowPos(NULL, pt.x + 200, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			pt.y += nHigh;
+			pTmp->ShowWindow(SW_SHOW);
+		}
+	}
+}
+
+void COrderManager::UpdateRecvInfo()
+{
+	CRect rc;
+	m_pNetBarDlg->GetClientRect(rc);
+	m_pNetBarDlg->ClientToScreen(rc);
+	CPoint pt(rc.TopLeft());
+
+	// 接单
+	pt = rc.TopLeft();
+	int nHighRecv = 90;
+	vector<CRecvDlg*>::iterator itRecv = m_vcRecvDlg.begin();
+	CRecvDlg* pTmp = nullptr;
+	for (; itRecv != m_vcRecvDlg.end(); itRecv++)
+	{
+		pTmp = *itRecv;
+		DWORD dwStatus = pTmp->GetRecvInfoStatus();
+		if (dwStatus == RECVINFO_SHOW)
+		{
+			pTmp->SetWindowPos(NULL, pt.x + 552, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			pt.y += nHighRecv;
+			pTmp->ShowWindow(SW_SHOW);
+		}
+	}
+}
+
+void COrderManager::DeleteRecvInfo(const CString& strOrderNum)
+{
+	itRecvInfo it = m_vcRecvInfo.begin();
+	itRecvInfo itDelete;
+
+	RecvInfo* pInfo = nullptr;
+	for (; it != m_vcRecvInfo.end(); it++)
+	{
+		pInfo = &(*it);
+
+		if (pInfo->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
+		{
+			itDelete = it;
+			m_vcRecvInfo.erase(itDelete);
+
+			return;
+		}
+	}
+}
+
+void COrderManager::SetRecvStatus(const CString& strOrderNum, DWORD dwStatus)
+{
+	itRecvInfo it = m_vcRecvInfo.begin();
+	for (; it != m_vcRecvInfo.end(); it++)
+	{
+		if (it->m_strOrderNum.CompareNoCase(strOrderNum) == 0)
+		{
+			it->m_dwShowOrder = dwStatus;
+		}
+	}
+}
+
+void COrderManager::CloseRecvOrder()
+{
+	vector<CRecvDlg*>::iterator it = m_vcRecvDlg.begin();
+	CString strNum;
+	CRecvDlg* pTmp = nullptr;
+	for (; it != m_vcRecvDlg.end(); it++)
+	{
+		pTmp = *it;
+		strNum = pTmp->GetOrderInfoNum();
+		DWORD dwStatus = pTmp->GetRecvInfoStatus();
+		if (dwStatus == RECVINFO_OVERTIME)// 判断是否需要删除的dlg
+		{
+			m_vcRecvDlg.erase(it);
+
+			if (pTmp)
+			{
+				delete pTmp;
+				pTmp = NULL;
+			}
+
+			return;
+		}
+	}
+}
+
 void COrderManager::InsertRecvOrder(RecvInfo pRecvInfo)
 {
 	m_vcRecvInfo.push_back(pRecvInfo);
@@ -361,26 +474,27 @@ void COrderManager::ShowRecvOrderInfo()
 	CPoint pt(rc.TopLeft());
 	int nCount = m_vcRecvInfo.size();
 
-	int nHigh = 80;
+	int nHigh = 90;
 	for (; it != m_vcRecvInfo.end(); it++)
 	{
-		if (it->m_bShowOrder == FALSE)
+		if (it->m_dwShowOrder == RECVINFO_INIT)
 		{
-			it->m_bShowOrder = TRUE;
+			it->m_dwShowOrder = RECVINFO_SHOW;
 			CRecvDlg* pRecvDlg = new CRecvDlg(&(*it));
 			pRecvDlg->SetParent(m_pNetBarDlg);
 
 			pRecvDlg->Create(IDD_RECV_DIALOG, m_pNetBarDlg);
 
 			pRecvDlg->SetWindowPos(NULL, pt.x + 552, pt.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
-			pt.y += nHigh;
+			
 			pRecvDlg->ShowWindow(SW_SHOW);
-
-			nCount--;
 
 			m_vcRecvDlg.push_back(pRecvDlg);
 		}
+		pt.y += nHigh;
 	}
+
+CloseRecvOrder();
 }
 
 void COrderManager::MoveWindow(CRect rcClient)
@@ -407,6 +521,7 @@ void COrderManager::MoveWindow(CRect rcClient)
 	CRecvDlg* pTempRecv = nullptr;
 
 	CPoint ptRecv(pt);
+	int nHighRecv = 90;
 	for (; itRecv != m_vcRecvDlg.end(); itRecv++)
 	{
 		pTempRecv = *itRecv;
@@ -414,6 +529,7 @@ void COrderManager::MoveWindow(CRect rcClient)
 		if (n)
 		{
 			pTempRecv->SetWindowPos(NULL, ptRecv.x + 552, ptRecv.y + 68, 380, 150, SWP_SHOWWINDOW | SWP_NOSIZE);
+			ptRecv.y += nHighRecv;
 		}
 	}
 }
@@ -471,14 +587,6 @@ void COrderManager::CloseCancelOrder()
 			}
 
 			return ;
-		}
-		else if (dwStatus == ORDERINFO_SHOW)
-		{
-			CRect rc;
-			pTmp->GetClientRect(rc);
-			pTmp->ClientToScreen(rc);
-			pTmp->InvalidateRect(rc, TRUE);
-			pTmp->UpdateWindow();
 		}
 	}
 }

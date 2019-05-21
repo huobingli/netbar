@@ -106,6 +106,7 @@ public:
 	
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void SetParent(CNetbarDlg* pParent);
+	CNetbarDlg* GetParent() { return m_pParent; }
 private:
 	CNetbarDlg* m_pParent;
 	CFont		m_font;			// 字体
@@ -130,24 +131,29 @@ public:
 
 	void ShowOrderInfo();								// 显示订单函数
 	void HideOrderDlg(const CString& strOrderNum);		// 先不删除，只是隐藏，之后在进行删除
-	
+	void UpdateOrderInfo();								// 用于更新订单
 	void CloseCancelOrder();							// 关闭已经取消的订单
-	
-	BOOL IsAlreadyInit(const CString& strOrderNum);
-
-	// 接单处理 方法
-	void ShowRecvOrderInfo();
-	void InsertRecvOrder(RecvInfo pRecvInfo);
-
-
-	// 公用方法
-	void MoveWindow(CRect rcClient);
-
 	void SetOrderStatus(const CString& strOrderNum, DWORD dwStatus);
 
 	// 是否有新订单
 	BOOL IsHasNewOrder() { return m_bNewOrder; }
 	void SetNewOrder(BOOL bFlag) { m_bNewOrder = bFlag; }
+
+	BOOL IsAlreadyInit(const CString& strOrderNum);
+
+	// 接单处理 方法
+	void ShowRecvOrderInfo();
+	void InsertRecvOrder(RecvInfo pRecvInfo);
+	void UpdateRecvInfo();																// 更新接单信息
+	void DeleteRecvInfo(const CString& strOrderNum);									// 删除接单信息
+	void SetRecvStatus(const CString& strOrderNum, DWORD dwStatus);						// 设置接单状态
+	void CloseRecvOrder();
+
+
+	// 公用方法
+	void MoveWindow(CRect rcClient);
+
+	
 private:
 	CNetbarDlg * m_pNetBarDlg;			// 父窗口
 
