@@ -138,6 +138,7 @@ public:
 	// 是否有新订单
 	BOOL IsHasNewOrder() { return m_bNewOrder; }
 	void SetNewOrder(BOOL bFlag) { m_bNewOrder = bFlag; }
+	BOOL IsHasShowOrderInfo();
 
 	BOOL IsAlreadyInit(const CString& strOrderNum);
 

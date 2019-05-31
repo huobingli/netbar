@@ -1,8 +1,26 @@
-﻿  CRecviceOrder.cpp
+﻿  stdafx.cpp
+  base64.cpp
+  CHttpClient.cpp
+  CMachineOrder.cpp
+  CMusicPlayer.cpp
+  CNetBarLoginDlg.cpp
+  COrderDlg.cpp
+  CRecviceOrder.cpp
   _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  CSingleton.cpp
+  CUserInfo.cpp
+  global.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  json_reader.cpp
+json_reader.cpp(1909): warning C4244: “=”: 从“Json::Value::UInt64”转换到“::size_t”，可能丢失数据
+  json_value.cpp
+  json_writer.cpp
+  md5.cpp
+  netbar.cpp
+  netbarDlg.cpp
   正在生成代码
-  2 of 1601 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  0 of 1602 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   netbar.vcxproj -> D:\netbar\netbar\Release\netbar.exe

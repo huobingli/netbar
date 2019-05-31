@@ -546,6 +546,20 @@ void COrderManager::SetOrderStatus(const CString& strOrderNum, DWORD dwStatus)
 	}
 }
 
+BOOL COrderManager::IsHasShowOrderInfo()
+{
+	itOrderInfo it = m_vcOrderInfo.begin();
+	for (; it != m_vcOrderInfo.end(); it++)
+	{
+		if (it->m_dwShowOrder == ORDERINFO_SHOW)
+		{
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
 BOOL COrderManager::IsAlreadyInit(const CString& strOrderNum)
 {
 	itOrderInfo it = m_vcOrderInfo.begin();
