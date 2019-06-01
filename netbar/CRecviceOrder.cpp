@@ -1,6 +1,8 @@
 #include "CRecviceOrder.h"
 #include "resource.h"
 #include "netbarDlg.h"
+#include "CHttpClient.h"
+#include "CUserInfo.h"
 
 
 // CRecviceOrder::CRecviceOrder()
@@ -46,6 +48,8 @@ BEGIN_MESSAGE_MAP(CRecvDlg, CDialog)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(ID_CANCEL_DAODIAN, &CRecvDlg::OnBnClickedCancelDaodian)
+	ON_BN_CLICKED(ID_CONFIM_RECVLAST, &CRecvDlg::OnBnClickedCancelDaodian)
+	ON_BN_CLICKED(ID_CONFIM_RECVFULL, &CRecvDlg::OnBnClickedCancelDaodian)
 END_MESSAGE_MAP()
 
 
@@ -226,6 +230,9 @@ void CRecvDlg::UpdateCountDown(UINT_PTR nIDEvent)
 				KillTimer(nIDEvent);
 				m_nSecond = 0;
 				m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
+				GetDlgItem(ID_CANCEL_DAODIAN)->ShowWindow(TRUE);
+				GetDlgItem(ID_CONFIM_RECVFULL)->ShowWindow(FALSE);
+				GetDlgItem(ID_CONFIM_RECVLAST)->ShowWindow(FALSE);
 				Invalidate(TRUE);
 				//AfxMessageBox(_T("Game Over!"));
 				return;
@@ -262,5 +269,68 @@ void CRecvDlg::OnBnClickedCancelDaodian()
 	m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
 
 	m_pParent->UpdateRecvInfo();
+	CDialog::OnOK();
+}
+
+// 退全款按钮
+void CRecvDlg::OnBnClickedConfirmFull()
+{
+	CString strOrderUrl;
+	strOrderUrl.LoadString(IDS_STRING_RECVFULL);
+
+	strOrderUrl.Format(strOrderUrl, m_pRecvInfo->m_strOrderNum ,CUserInfoHolder::Instance()->GetUrlParam());
+	CHttpClient* pHttpClient = new CHttpClient;
+	LPCTSTR pJsonPostData = _T("");
+	CString strResponse;
+
+	if (pHttpClient)
+	{
+		pHttpClient->HttpPost(strOrderUrl, pJsonPostData, strResponse);
+	}
+
+	if (pHttpClient)
+	{
+		delete pHttpClient;
+		pHttpClient = NULL;
+	}
+
+	// 删除了
+	m_pParent->DeleteRecvInfo(m_pRecvInfo->m_strOrderNum);
+	m_pParent->SetRecvStatus(m_pRecvInfo->m_strOrderNum, RECVINFO_OVERTIME);
+	m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
+
+	m_pParent->UpdateRecvInfo();
+	AfxMessageBox(_T("退款成功"));
+	CDialog::OnOK();
+}
+
+// 退余款按钮
+void CRecvDlg::OnBnClickedConfirmLast()
+{
+	CString strOrderUrl;
+	strOrderUrl.LoadString(IDS_STRING_RECVLAST);
+
+	strOrderUrl.Format(strOrderUrl, m_pRecvInfo->m_strOrderNum, CUserInfoHolder::Instance()->GetUrlParam());
+	CHttpClient* pHttpClient = new CHttpClient;
+	LPCTSTR pJsonPostData = _T("");
+	CString strResponse;
+
+	if (pHttpClient)
+	{
+		pHttpClient->HttpPost(strOrderUrl, pJsonPostData, strResponse);
+	}
+
+	if (pHttpClient)
+	{
+		delete pHttpClient;
+		pHttpClient = NULL;
+	}
+
+	m_pParent->DeleteRecvInfo(m_pRecvInfo->m_strOrderNum);
+	m_pParent->SetRecvStatus(m_pRecvInfo->m_strOrderNum, RECVINFO_OVERTIME);
+	m_pRecvInfo->m_dwShowOrder = RECVINFO_OVERTIME;
+
+	m_pParent->UpdateRecvInfo();
+	AfxMessageBox(_T("退款成功"));
 	CDialog::OnOK();
 }

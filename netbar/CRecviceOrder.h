@@ -90,5 +90,7 @@ private:
 	CFont			m_fontMessage;
 public:
 	afx_msg void OnBnClickedCancelDaodian();
+	afx_msg void OnBnClickedConfirmFull();
+	afx_msg void OnBnClickedConfirmLast();
 };
 
