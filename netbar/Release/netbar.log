@@ -19,8 +19,6 @@ json_reader.cpp(1909): warning C4244: “=”: 从“Json::Value::UInt64”转�
   netbar.cpp
   netbarDlg.cpp
   正在生成代码
-  0 of 1602 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  All 1609 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   已完成代码的生成
   netbar.vcxproj -> D:\netbar\netbar\Release\netbar.exe

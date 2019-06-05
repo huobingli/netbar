@@ -444,7 +444,7 @@ void COrderManager::CloseRecvOrder()
 		pTmp = *it;
 		strNum = pTmp->GetOrderInfoNum();
 		DWORD dwStatus = pTmp->GetRecvInfoStatus();
-		if (dwStatus == RECVINFO_OVERTIME)// 判断是否需要删除的dlg
+		if (dwStatus == RECVINFO_NEEDDELETE)// 判断是否需要删除的dlg
 		{
 			m_vcRecvDlg.erase(it);
 
@@ -494,7 +494,7 @@ void COrderManager::ShowRecvOrderInfo()
 		pt.y += nHigh;
 	}
 
-CloseRecvOrder();
+	CloseRecvOrder();
 }
 
 void COrderManager::MoveWindow(CRect rcClient)

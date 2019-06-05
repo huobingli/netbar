@@ -9,7 +9,7 @@ using namespace std;
 #define RECVINFO_NEW			0x0001		// 已接新订单				
 #define RECVINFO_SHOW			0x0002		// 已接显示的订单
 #define RECVINFO_OVERTIME		0x0003		// 已接订单超期
-
+#define RECVINFO_NEEDDELETE		0x0004		// 已接订单需要删除
 
 // 订单信息
 struct RecvInfo

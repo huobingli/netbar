@@ -16,6 +16,9 @@ public:
 
 	void SetStaffInfo(const CString& strStaffID) { m_strStaffID = strStaffID; }
 	CString GetStaffInfo() { return m_strStaffID; }
+
+	BOOL GetNetBarStatus() { return m_bStatus; }
+	void SetNetBarStatus(BOOL bStatus) { m_bStatus = bStatus; }
 private:
 	CString m_strUsername;
 	CString m_strPassword;
@@ -26,6 +29,7 @@ private:
 	CString m_strNetInfo;
 
 	CString m_strStaffID;
+	BOOL	m_bStatus;
 };
 
 //typedef CSingleton<CUserInfo> CUserInfo
